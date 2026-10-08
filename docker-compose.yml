@@ -8,7 +8,7 @@ services:
         NEXT_PUBLIC_BING_VERIFICATION: ${NEXT_PUBLIC_BING_VERIFICATION:-}
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3000:3000"   # put nginx/Caddy in front for TLS
+      - "127.0.0.1:3200:3000"   # host 3000/3100 are used by other projects; nginx proxies here
     environment:
       IPINFO_TOKEN: ${IPINFO_TOKEN:-}
       PAGESPEED_API_KEY: ${PAGESPEED_API_KEY:-}
