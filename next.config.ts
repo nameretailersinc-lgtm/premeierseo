@@ -11,6 +11,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Minimal self-contained server for the Docker image (see Dockerfile).
+  output: "standalone",
   // Every page URL ends with "/" (the live WordPress convention). src/proxy.ts performs
   // slash, case, alias and 410 handling in a single 301 hop, so the built-in slash
   // redirect is switched off to avoid two-hop chains.

@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+crawl
+docs
+scripts/*.py
+*.tsbuildinfo
+.env*
+npm-debug.log*

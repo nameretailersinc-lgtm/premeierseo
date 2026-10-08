@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
+        NEXT_PUBLIC_GSC_VERIFICATION: ${NEXT_PUBLIC_GSC_VERIFICATION:-}
+        NEXT_PUBLIC_BING_VERIFICATION: ${NEXT_PUBLIC_BING_VERIFICATION:-}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"   # put nginx/Caddy in front for TLS
+    environment:
+      IPINFO_TOKEN: ${IPINFO_TOKEN:-}
+      PAGESPEED_API_KEY: ${PAGESPEED_API_KEY:-}
+      REPORT_WEBHOOK_URL: ${REPORT_WEBHOOK_URL:-}
