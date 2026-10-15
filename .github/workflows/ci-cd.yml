@@ -1,0 +1,97 @@
+name: CI and container delivery
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Quality checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run validate
+      - run: npm run test:seo
+      # next build generates route types before the explicit typecheck.
+      - run: npm run build
+      - run: npm run typecheck
+
+  container:
+    name: Build and deliver container
+    needs: checks
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write
+    env:
+      NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+      NEXT_PUBLIC_GSC_VERIFICATION: ${{ vars.NEXT_PUBLIC_GSC_VERIFICATION }}
+      NEXT_PUBLIC_BING_VERIFICATION: ${{ vars.NEXT_PUBLIC_BING_VERIFICATION }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set immutable image tag
+        id: image
+        shell: bash
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:sha-${GITHUB_SHA}"
+          echo "tag=$image" >> "$GITHUB_OUTPUT"
+      - name: Build standalone image
+        env:
+          IMAGE: ${{ steps.image.outputs.tag }}
+        run: |
+          docker build --tag "$IMAGE" \
+            --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --build-arg NEXT_PUBLIC_GA_ID \
+            --build-arg NEXT_PUBLIC_GSC_VERIFICATION \
+            --build-arg NEXT_PUBLIC_BING_VERIFICATION .
+      - name: Smoke-test container before publishing
+        env:
+          IMAGE: ${{ steps.image.outputs.tag }}
+        run: |
+          docker run --detach --name seo-smoke --publish 127.0.0.1:3200:3000 "$IMAGE"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --max-time 5 http://127.0.0.1:3200/ > /dev/null; then break; fi
+            sleep 2
+          done
+          for route in / /robots.txt /sitemap.xml /blog/google-indexing-troubleshooting/; do
+            curl --fail --silent --show-error --max-time 15 "http://127.0.0.1:3200$route" > /dev/null
+          done
+      - name: Container logs
+        if: failure()
+        run: docker logs seo-smoke || true
+      - name: Remove smoke container
+        if: always()
+        run: docker rm --force seo-smoke || true
+      - name: Publish tested image to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE: ${{ steps.image.outputs.tag }}
+        run: |
+          echo "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          docker push "$IMAGE"
+          echo "Published: \`$IMAGE\`" >> "$GITHUB_STEP_SUMMARY"
+      - name: Registry logout
+        if: always()
+        run: docker logout ghcr.io
