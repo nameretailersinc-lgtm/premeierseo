@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "validate": "tsx scripts/validate-content.ts",
+    "test:seo": "node --conditions=react-server --import tsx scripts/seo-regression.ts",
     "vendor": "node scripts/copy-vendor.mjs",
     "prebuild": "node scripts/copy-vendor.mjs",
     "predev": "node scripts/copy-vendor.mjs"

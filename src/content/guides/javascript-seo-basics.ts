@@ -9,6 +9,7 @@ export const javascriptSeoBasics = defineGuide({
   summary:
     "Google renders JavaScript, but in a separate, later phase than crawling: it crawls, queues the page for rendering, then indexes what the rendered HTML contains. Content that needs a click, a scroll, a cookie or a user-specific session to appear will not be indexed. Rendering also has to work **without state**, because Googlebot arrives fresh every time.",
   cluster: "Technical SEO",
+  dateModified: "2026-10-15",
   tools: ["html-viewer", "mobile-friendly-test", "website-speed-checker", "heading-tag-extractor"],
   body: [
     {
@@ -96,7 +97,7 @@ A quick sanity check: the ${t("heading-tag-extractor", "heading tag extractor")}
 
 **7. Confirm the page is linked.** A URL reachable only by a click handler, or only from a sitemap, has weak discovery. Add real \`<a href>\` links.
 
-For a view of how the page behaves on a mobile crawl, the ${t("mobile-friendly-test", "mobile-friendly test")} loads the URL as a mobile device and reports what rendered, and a ${t("website-speed-checker", "website speed checker")} shows whether the critical content arrives early or late in the load. Neither replaces URL Inspection, which is the only tool that reports what Google itself rendered, but both are faster for iterating on a fix.`,
+The ${t("mobile-friendly-test", "mobile viewport checker")} offers source-level viewport checks and a browser preview where embedding is allowed. It does not emulate Googlebot or certify mobile usability. The ${t("website-speed-checker", "website speed checker")} requests PageSpeed Insights data where available; field and lab measurements differ. Use URL Inspection to see what Google rendered. Follow the [indexing troubleshooting checklist](/blog/google-indexing-troubleshooting/) for a broader diagnosis.`,
     },
   ],
   sources: [

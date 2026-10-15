@@ -7,7 +7,8 @@ export const noindexVsRobotsTxt = defineGuide({
   metaDescription:
     "Robots.txt stops crawling; noindex stops indexing. Why combining them backfires, how blocked pages still appear in results, and which to use when.",
   summary:
-    "Robots.txt controls **crawling**; a `noindex` rule controls **indexing**. They are not interchangeable, and using both on one URL cancels the `noindex`, because Google has to fetch a page to see the rule. Block crawling to save server work; use `noindex` to keep a page out of search results.",
+    "Robots.txt controls **crawling**; a `noindex` rule controls **indexing**. Blocking crawling can prevent Google from discovering a new noindex directive; it does not cancel a directive already processed. Keep public pages crawlable when Google needs to read their indexing instructions.",
+  dateModified: "2026-10-15",
   cluster: "Technical SEO",
   tools: ["robots-txt-generator", "robots-txt-tester", "meta-tags-analyzer", "xml-sitemap-generator"],
   body: [
@@ -38,7 +39,7 @@ So the rule is:
 
 - **Do not want it crawled** (wasteful, infinite, server-heavy): robots.txt.
 - **Do not want it in search results**: \`noindex\`.
-- **Do not want it crawled *or* in results**: \`noindex\` first, and only add the \`Disallow\` later, once the URL has dropped out.`,
+- **Need private content hidden**: require authentication. For public pages that must stay out of results, keep them crawlable so Google can continue reading \`noindex\`.`,
     },
     {
       heading: "Why combining them backfires",
@@ -48,7 +49,7 @@ The correct sequence for removing a page from search results while eventually al
 
 1. Serve \`noindex\` on the page and make sure it is **crawlable**.
 2. Wait for Google to recrawl and drop it. Search Console's URL Inspection confirms when the page is "Excluded by 'noindex' tag".
-3. Only then, if the crawling itself is a problem, add a \`Disallow\`.
+3. Keep the URL crawlable so Google can continue observing \`noindex\`. For private content, use authentication instead.
 
 Two related misconceptions:
 
@@ -80,7 +81,7 @@ Allow: /assets/css/
 
 **The file must be at the host root**, as \`/robots.txt\`, and applies per host and protocol. \`https://example.com\` and \`https://shop.example.com\` need their own files.
 
-**\`Crawl-delay\` is ignored by Google.** Bing and some others honour it. To slow Google down, fix what makes crawling expensive or use the crawl-rate controls in Search Console.
+**\`Crawl-delay\` is ignored by Google.** Some other crawlers honour it. Investigate server load and follow Google's current crawl-rate guidance; the old Search Console crawl-rate setting is no longer available.
 
 Never block CSS or JavaScript that the page needs to render. Google renders pages, and blocking the assets makes it evaluate a broken layout. The ${t("robots-txt-generator", "robots.txt generator")} produces a file with correctly ordered groups and the \`Sitemap\` directive placed outside them, which is where every crawler expects it.`,
     },

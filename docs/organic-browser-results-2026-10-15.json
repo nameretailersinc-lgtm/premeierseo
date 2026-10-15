@@ -1,0 +1,38 @@
+[
+  {
+    "path": "/blog/google-indexing-troubleshooting/",
+    "colorScheme": "light",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "path": "/contact/",
+    "colorScheme": "light",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "path": "/meta-tags-analyzer/",
+    "colorScheme": "light",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "path": "/blog/google-indexing-troubleshooting/",
+    "colorScheme": "dark",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "path": "/contact/",
+    "colorScheme": "dark",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "path": "/meta-tags-analyzer/",
+    "colorScheme": "dark",
+    "overflow": false,
+    "violations": []
+  }
+]

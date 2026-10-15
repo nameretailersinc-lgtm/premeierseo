@@ -103,6 +103,9 @@ function safeLookup(
 }
 
 export function normalizeUserUrl(input: string): URL {
+  if (typeof input !== "string" || input.length > 4096) {
+    throw new FetchError("INVALID_URL", "Enter a web address of at most 4,096 characters.");
+  }
   let s = input.trim();
   if (!s) throw new FetchError("INVALID_URL", "Enter a web address.");
   if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) s = `https://${s}`;

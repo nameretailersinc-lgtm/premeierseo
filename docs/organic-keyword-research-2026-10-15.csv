@@ -1,0 +1,31 @@
+keyword,intent,primary_path,priority,gap,monthly_volume,difficulty,countries,evidence
+technical SEO checklist for small business websites,informational,/website-seo-score-checker/,P1,Limited HTML scope versus full audit,Unverified,Unverified,US UK CA AU PK,Topic SERP sampled; exact country demand unverified
+how to fix Google indexing issues,informational,/blog/google-indexing-troubleshooting/,P1,New diagnostic guide,Unverified,Unverified,US UK CA AU PK,Google indexing documentation
+why is my website not showing on Google,informational,/blog/google-indexing-troubleshooting/,P1,New diagnostic guide,Unverified,Unverified,US UK CA AU PK,Google indexing documentation
+how to improve Core Web Vitals in Next.js,informational,/blog/javascript-seo-basics/,P2,Partial match; framework-specific measurement needed,Unverified,Unverified,US UK CA AU PK,Next.js topic results sampled
+how to fix duplicate canonical tags,informational,/blog/canonical-tags-explained/,P1,Template diagnosis,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+how to optimize XML sitemap for Google,informational,/blog/xml-sitemaps-explained/,P1,Eligibility and truthful dates,Unverified,Unverified,US UK CA AU PK,Google sitemap documentation
+affordable SEO services for small businesses,commercial,,Excluded,Outside confirmed free-tools offering,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+SEO strategy for a new business website,informational,,Deferred,Needs demand validation and original strategy coverage,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+how to improve local SEO for small businesses,informational,,Deferred,Needs localized research,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+SEO checklist for small business owners,informational,/website-seo-score-checker/,P2,Partial match; limited single-page analysis,Unverified,Unverified,US UK CA AU PK,Technical checklist topic sampled
+how long does SEO take for a new website,informational,,Deferred,No timeline guarantees or suitable existing guide,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+SEO audit services for small businesses,commercial,,Excluded,Outside confirmed free-tools offering,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+Next.js SEO checklist for App Router,informational,/blog/javascript-seo-basics/,P2,Partial match; version-specific examples needed,Unverified,Unverified,US UK CA AU PK,Official Next.js metadata reference
+how to optimize Next.js website for Google,informational,/blog/javascript-seo-basics/,P2,Partial match; implementation examples needed,Unverified,Unverified,US UK CA AU PK,Next.js topic results sampled
+Next.js dynamic metadata SEO guide,informational,/blog/javascript-seo-basics/,P2,Partial match; Metadata API examples needed,Unverified,Unverified,US UK CA AU PK,Official generateMetadata reference
+how to fix Next.js pages not indexing,informational,/blog/google-indexing-troubleshooting/,P1,Partial match; framework diagnosis needed,Unverified,Unverified,US UK CA AU PK,Google JavaScript SEO reference
+server side rendering vs static generation for SEO,informational,/blog/javascript-seo-basics/,P2,Compare rendered output without ranking promises,Unverified,Unverified,US UK CA AU PK,Google JavaScript SEO reference
+how to generate sitemap in Next.js App Router,informational,/blog/xml-sitemaps-explained/,P2,Partial match; native code examples needed,Unverified,Unverified,US UK CA AU PK,Official Next.js sitemap result
+ecommerce SEO checklist for beginners,informational,,Deferred,Validate before expanding topic coverage,Unverified,Unverified,US UK CA AU PK,Ecommerce topic search sampled
+how to optimize ecommerce category pages,informational,,Deferred,No suitable collection-page guide,Unverified,Unverified,US UK CA AU PK,Shopify category-page guide observed
+SEO for small Shopify stores,informational,,Deferred,Needs platform-specific original coverage,Unverified,Unverified,US UK CA AU PK,Shopify topic sampled; exact SERP unverified
+how to fix duplicate product pages SEO,informational,/blog/duplicate-content-explained/,P2,Partial match; variants and collections examples,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+ecommerce product page SEO best practices,informational,,Deferred,No suitable existing guide,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+technical SEO audit for ecommerce websites,informational,/website-seo-score-checker/,P3,Partial match; single-page tool cannot audit store,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+free SEO audit tool for websites,tool,/website-seo-score-checker/,P1,Explain static HTML limitations,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified
+free meta title and description checker,tool,/meta-tags-analyzer/,P1,Source-level tags and preview caveats,Unverified,Unverified,US UK CA AU PK,Rootscript and PeakKR observed
+keyword density checker online free,tool,/keyword-density-checker/,P1,No ideal density ranking claims,Unverified,Unverified,US UK CA AU PK,Toolmatic and Zerply observed
+Google SERP preview tool free,tool,/serp-simulator/,P1,Preview versus actual Google snippet,Unverified,Unverified,US UK CA AU PK,Combined search sampled; exact SERP unverified
+robots.txt generator for website,tool,/robots-txt-generator/,P1,Crawl versus indexing and rule testing,Unverified,Unverified,US UK CA AU PK,SEOMagnate and Ease Tools observed
+how to increase website impressions on Google,informational,/blog/google-indexing-troubleshooting/,P2,Partial match; needs actual GSC query analysis,Unverified,Unverified,US UK CA AU PK,Exact SERP unverified

@@ -95,7 +95,9 @@ export function analyzeHtml(html: string, pageUrl: string): PageFacts {
       return { raw: raw.slice(0, 20000), types: [], valid: false, error: e instanceof Error ? e.message : "Invalid JSON" };
     }
   });
-  const body = root.querySelector("body") ?? root;
+  // Preserve source facts while removing non-readable content from a separate tree.
+  const textRoot = parse(html, { comment: false });
+  const body = textRoot.querySelector("body") ?? textRoot;
   body.querySelectorAll("script,style,noscript,template,svg").forEach((n) => n.remove());
   const text = body.text.replace(/\s+/g, " ").trim();
   const words = text.match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu) ?? [];
@@ -120,7 +122,11 @@ export function analyzeHtml(html: string, pageUrl: string): PageFacts {
       }
     }),
     viewport: metaBy("viewport")[0]?.getAttribute("content") ?? null,
-    favicon: iconEl ? new URL(iconEl.getAttribute("href") || "/favicon.ico", pageUrl).toString() : null,
+    favicon: (() => {
+      if (!iconEl) return null;
+      try { return new URL(iconEl.getAttribute("href") || "/favicon.ico", pageUrl).toString(); }
+      catch { return null; }
+    })(),
     hreflang: root
       .querySelectorAll('link[rel="alternate"][hreflang]')
       .map((l) => ({ lang: l.getAttribute("hreflang") || "", href: l.getAttribute("href") || "" })),

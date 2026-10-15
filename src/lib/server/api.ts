@@ -11,9 +11,20 @@ export async function readBody<T>(req: Request, maxBytes = 20_000): Promise<T | 
   const len = Number(req.headers.get("content-length") || 0);
   if (len > maxBytes) return null;
   try {
-    const text = await req.text();
-    if (text.length > maxBytes) return null;
-    return JSON.parse(text) as T;
+    if (!req.body) return null;
+    const reader = req.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let bytes = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > maxBytes) { await reader.cancel(); return null; }
+      chunks.push(value);
+    }
+    const data: unknown = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+    return data as T;
   } catch {
     return null;
   }
@@ -25,8 +36,13 @@ export function guard(req: Request, limit = 30): Response | null {
   }
   const origin = req.headers.get("origin");
   const host = req.headers.get("host");
-  if (origin && host && new URL(origin).host !== host) {
-    return json({ error: { code: "FORBIDDEN", message: "Cross-site requests are not allowed." } }, 403);
+  if (origin) {
+    try {
+      const parsed = new URL(origin);
+      if (!host || !["http:", "https:"].includes(parsed.protocol) || parsed.host !== host) throw new Error("origin");
+    } catch {
+      return json({ error: { code: "FORBIDDEN", message: "Cross-site requests are not allowed." } }, 403);
+    }
   }
   return null;
 }

@@ -13,6 +13,11 @@ export async function POST(req: Request) {
   if (blocked) return blocked;
   const body = await readBody<{ kind?: string; tool?: string; reason?: string; message?: string; email?: string; website?: string; topic?: string; name?: string }>(req, 10_000);
   if (!body) return json({ error: { code: "INVALID", message: "Please fill in the form." } }, 400);
+  if (!["contact", "problem"].includes(body.kind ?? "") ||
+    [body.tool, body.reason, body.message, body.email, body.website, body.topic, body.name]
+      .some((value) => value !== undefined && typeof value !== "string")) {
+    return json({ error: { code: "INVALID", message: "Please use text values and a valid message type." } }, 400);
+  }
   if (body.website) return json({ ok: true }); // honeypot: silently accept bots
   const message = (body.message ?? "").trim().slice(0, 4000);
   const email = (body.email ?? "").trim().slice(0, 200);

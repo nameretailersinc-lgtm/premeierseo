@@ -73,6 +73,7 @@ export function ReportForm({ kind, tools, email }: { kind: "problem" | "contact"
           if (!r.ok || d.error) throw new Error(d.error?.message ?? "Sending failed.");
           setState("sent");
           if (kind === "problem") track("problem_reported", { tool_id: tool || "none", reason });
+          else track("contact_sent");
         } catch (err) {
           setState("error");
           setErrMsg(err instanceof Error ? err.message : "Sending failed.");
@@ -129,6 +130,7 @@ export function ReportForm({ kind, tools, email }: { kind: "problem" | "contact"
           className="textarea"
           style={{ ["--ta-min" as string]: "8rem" }}
           maxLength={4000}
+          required={kind === "contact"}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           aria-describedby={`${id}-msg-help`}

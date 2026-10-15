@@ -48,7 +48,7 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
   const crumbs: Crumb[] = [{ name: "Home", path: "/" }, { name: cat.label, path: cat.path }, { name: tool.name }];
   const related = relatedTools(tool, 6);
   const privacy = privacyStatement(tool);
-  const guides = (tool.guides ?? []).map((g) => GUIDES.find((x) => x.path === g)).filter(Boolean);
+  const guides = GUIDES.filter((g) => (tool.guides ?? []).includes(g.path) || g.tools.includes(tool.id)).slice(0, 5);
   const contextual = (tool.links ?? []).filter((l) => !related.some((r) => r.path === l.href) && !l.href.startsWith("/blog/"));
   const jumps = jumpLinks(tool);
 

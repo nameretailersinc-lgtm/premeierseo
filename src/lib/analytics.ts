@@ -21,11 +21,14 @@ function optedOut(): boolean {
 }
 
 export function track(event: string, params: Params = {}): void {
-  if (typeof window === "undefined" || optedOut()) return;
+  if (typeof window === "undefined" || !process.env.NEXT_PUBLIC_GA_ID || optedOut()) return;
   const clean: Params = {};
   for (const [k, v] of Object.entries(params)) if (v !== undefined) clean[k] = v;
   if (window.gtag) window.gtag("event", event, clean);
-  else (window.__pssQueue ||= []).push([event, clean]);
+  else {
+    const queue = (window.__pssQueue ||= []);
+    if (queue.length < 100) queue.push([event, clean]);
+  }
 }
 
 export function bucket(n: number, edges: number[], labels: string[]): string {

@@ -1,0 +1,114 @@
+Premier SEO Services — main branch implementation, 15 October 2026
+
+Branch and scope
+Resumed on main at 0bfd3c7 after the master fast-forward merge. The earlier SEO
+working changes were absent and were reapplied. Dockerfile and compose changes,
+including host port 3200, were preserved. No deployment or remote push performed.
+The owner confirmed the free-tools offering: paid service pages are excluded.
+
+Application discovery
+Next.js 16.3.7 App Router / React / TypeScript, source-controlled content, 172 tools,
+nine categories and now 18 guides. Remote-check APIs use Node; many widgets process
+locally in the browser. No admin CMS, database publishing workflow or authenticated
+Search Console dataset was identified. Existing metadata/canonical/JSON-LD helpers,
+robots, sitemap and migration redirects/410 responses were retained.
+Production homepage inspection supported the free-tools model, but deployment
+parity was not established. Browsing-service failures on live sitemap/robots/blog
+are inconclusive; they do not prove the production website is broken.
+
+Changes
+- Stream JSON bodies with actual byte limits; reject primitive/array JSON.
+- Reject malformed/cross-site Origin headers without an uncaught exception.
+- Validate contact kind and field types before trimming; require contact message.
+- Emit contact_sent after successful contact response without message/email data.
+- Avoid analytics queues without configured GA and cap pending events at 100.
+  Existing GPC/DNT checks retained; consent policy and third-party loading require
+  separate review. No universal consent-compliance claim is made.
+- Preserve HTML source tree when extracting readable text, fixing script counts.
+  Invalid favicon URLs no longer crash source analysis.
+- Reject non-string and overlong URL inputs; retain existing DNS/address checks.
+- Link tool pages back to guides that use them, capped at five related guides.
+- Publish /blog/google-indexing-troubleshooting/ with original response/indexing,
+  robots/canonical, rendering and quality diagnosis. Existing template supplies
+  author, dates, breadcrumbs and BlogPosting metadata/structured data.
+- Correct obsolete crawl-rate and noindex guidance; correct mobile-checker claims
+  in the JavaScript SEO guide. Updated content dates reflect this edit.
+- Include guide changes in homepage sitemap lastmod. New guide enters automatically.
+- Add npm run test:seo for request/analyzer/private-IP/sitemap regressions.
+
+Keyword deliverable
+organic-keyword-research-2026-10-15.csv contains all 30 requested candidates.
+Paths resolve against https://premierseoservices.com. Blank targets are explicitly
+deferred or excluded; partial matches need further editorial work and are not
+asserted to satisfy the full query. P1 terms are high relevance to current tools;
+P2 terms are supporting/partial topics; P3 and excluded terms have weaker fit.
+Volume and difficulty are Unverified throughout. Country list is proposed scope,
+not verified country demand. Exact-query SERP research remains incomplete and is
+identified in evidence notes. No authenticated metrics, rankings or estimates.
+Observed topic samples included Rootscript/PeakKR metadata tools, Toolmatic/Zerply
+density tools, SEOMagnate/Ease Tools robots generators, Shopify category guidance
+and Next.js metadata/sitemap documentation. Samples do not establish demand.
+
+Verification on restored main
+Content validation: pass, 172 tools / nine categories / 18 guides, eight warnings
+for planned unpublished guides. Existing renderer suppresses those guide links.
+SEO regression tests: pass, 204 unique sitemap URLs; eligibility of every tool
+and guide checked. Tested malformed JSON/contact/Origin, private-IP rejection,
+script counting and malformed favicon handling. These are not full network SSRF
+integration tests or end-to-end email delivery tests.
+Lint: pass, zero errors, five existing warnings in effects and QA helper variables.
+Final production build: pass, including TypeScript, 421 static outputs (includes
+metadata images; not an indexable-page count).
+Fresh main production-build crawl: 210 routes, 209 HTTP 200s plus intentional
+not-found check; 204 sitemap URLs; 195 redirect checks; 147 removed-URL checks.
+Zero critical/high findings, three large-HTML warnings and one low-inlink warning.
+Local evidence: docs/qa/organic-main-2026-10-15.json (ignored QA directory).
+Fresh guide overflow: pass at widths 320/375/768/1024/1280/1440/1920.
+Focused accessibility check: pass on new guide, contact and meta-tags analyzer at
+390px in light/dark modes: six page-mode checks, zero axe violations and no
+horizontal overflow. Output: docs/organic-browser-results-2026-10-15.json.
+Automated coverage is representative; it does not replace manual accessibility QA.
+Earlier pre-merge crawl: 210 routes, 204 sitemap URLs, 195 redirect checks,
+147 removed-URL checks, zero critical/high findings; three large-HTML warnings and
+one low-inlink warning. These earlier results must not be described as a fresh
+main-branch crawl. Earlier new-guide overflow checks passed 320–1920 widths; the
+restored guide has revised text and needs fresh browser checks.
+Earlier accessibility scan did not produce a confirmed fresh result.
+
+Prioritized remaining issues and external dependencies
+P1: Obtain authorized Search Console exports for page/query CTR, positions 8–30,
+indexing, country/device and trend analysis. No credentials should be shared.
+P1: Confirm REPORT_WEBHOOK_URL and delivery in deployment. Without configuration
+the form intentionally reports 503 and offers email. No real messages sent.
+P1: Measure reproducible Lighthouse and field CWV; no LCP/INP/CLS or before/after
+improvement is claimed. Earlier crawl flags large HTML on /, /text-tools/, /tools/.
+P2: Complete browser accessibility and functionality coverage for all SEO widgets.
+P2: Controlled DNS-rebinding/redirect-private-target/timeout tests and platform
+rate limiting. Existing in-memory rate limits depend on trusted proxy headers.
+P2: Exact-query and country-specific keyword validation with appropriate data.
+Defer ecommerce/local/Next.js hub expansion until differentiated coverage and
+demand justify it. Do not manufacture service pages or regional doorway pages.
+P2: /video-to-gif/ had two incoming pages in the earlier crawl; add contextual
+links when useful rather than repetitive sitewide links.
+
+30/60/90-day roadmap
+Days 1–30: review changes; authorize deployment separately; verify deployed HTML,
+robots and sitemap; verify contact relay and analytics policy; collect GSC exports
+and mobile lab/field baselines. Optimize actual high-impression low-CTR pages.
+Days 31–60: validate demand per English market; improve existing tool examples;
+profile shared HTML and bundle costs; publish a few practical query-led guides
+and interlink them with tools. Track useful tool completions and contact events.
+Days 61–90: compare equal-length organic reporting periods with seasonality in
+mind; expand useful topics based on evidence; resolve indexing by reported cause;
+repeat crawling/accessibility/performance checks. No traffic/ranking guarantees.
+
+References consulted earlier in this session
+https://developers.google.com/search/docs/crawling-indexing/robots/intro
+https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics
+https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap
+https://nextjs.org/docs/app/api-reference/functions/generate-metadata
+Installed Next.js docs read before edits. Existing structured data uses real
+organization/software/article facts; no ratings, clients or locations were added.
+
+This report distinguishes implemented changes from incomplete master-prompt scope.
+It does not claim that every phase or every requested test is complete.

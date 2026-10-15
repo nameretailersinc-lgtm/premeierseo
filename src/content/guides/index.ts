@@ -16,12 +16,14 @@ import { reducePhotoSizeInKb } from "./reduce-photo-size-in-kb";
 import { robotsTxtGuide } from "./robots-txt-guide";
 import { writeTitleTagsMetaDescriptions } from "./write-title-tags-meta-descriptions";
 import { xmlSitemapsExplained } from "./xml-sitemaps-explained";
+import { googleIndexingTroubleshooting } from "./google-indexing-troubleshooting";
 
 /**
  * Published guides. Author is the organisation until named authors are supplied.
  * Each guide lives in its own file; `defineGuide` (./shared) derives path, dates, reading time and live tool ids.
  */
 export const GUIDES: GuideDef[] = [
+  googleIndexingTroubleshooting,
   reducePhotoSizeInKb,
   jpgVsPngVsWebp,
   reducePdfFileSize,

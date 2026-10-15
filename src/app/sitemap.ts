@@ -9,7 +9,7 @@ import { absUrl } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const newest = (dates: string[]) => dates.sort().at(-1)!;
   const entries: MetadataRoute.Sitemap = [
-    { url: absUrl("/"), lastModified: newest(TOOLS.map((t) => t.updated)) },
+    { url: absUrl("/"), lastModified: newest([...TOOLS.map((t) => t.updated), ...GUIDES.map((g) => g.dateModified)]) },
     { url: absUrl("/tools/"), lastModified: newest(TOOLS.map((t) => t.updated)) },
     ...CATEGORIES.map((c) => ({
       url: absUrl(c.path),
