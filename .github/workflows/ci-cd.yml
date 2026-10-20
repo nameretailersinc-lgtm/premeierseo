@@ -1,4 +1,4 @@
-name: CI and container delivery
+name: CI and Container Delivery
 
 on:
   pull_request:
@@ -11,52 +11,76 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: premierseo-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   checks:
-    name: Quality checks
+    name: Quality Checks
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     env:
-      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_TELEMETRY_DISABLED: "1"
+
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run validate
-      - run: npm run test:seo
-      # next build generates route types before the explicit typecheck.
-      - run: npm run build
-      - run: npm run typecheck
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Validate project
+        run: npm run validate
+
+      - name: Run SEO tests
+        run: npm run test:seo
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
 
   container:
-    name: Build and deliver container
+    name: Build and Publish Docker Image
     needs: checks
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 25
+
     permissions:
       contents: read
       packages: write
+
     env:
       NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
       NEXT_PUBLIC_GSC_VERIFICATION: ${{ vars.NEXT_PUBLIC_GSC_VERIFICATION }}
       NEXT_PUBLIC_BING_VERIFICATION: ${{ vars.NEXT_PUBLIC_BING_VERIFICATION }}
+
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Set immutable image tag
         id: image
         shell: bash
         run: |
           image="ghcr.io/${GITHUB_REPOSITORY,,}:sha-${GITHUB_SHA}"
           echo "tag=$image" >> "$GITHUB_OUTPUT"
-      - name: Build standalone image
+
+      - name: Build Docker image
         env:
           IMAGE: ${{ steps.image.outputs.tag }}
         run: |
@@ -65,33 +89,131 @@ jobs:
             --label "org.opencontainers.image.revision=$GITHUB_SHA" \
             --build-arg NEXT_PUBLIC_GA_ID \
             --build-arg NEXT_PUBLIC_GSC_VERIFICATION \
-            --build-arg NEXT_PUBLIC_BING_VERIFICATION .
-      - name: Smoke-test container before publishing
+            --build-arg NEXT_PUBLIC_BING_VERIFICATION \
+            .
+
+      - name: Start smoke-test container
         env:
           IMAGE: ${{ steps.image.outputs.tag }}
         run: |
-          docker run --detach --name seo-smoke --publish 127.0.0.1:3200:3000 "$IMAGE"
+          docker run -d \
+            --name seo-smoke \
+            --publish 127.0.0.1:3200:3000 \
+            "$IMAGE"
+
+      - name: Wait for application
+        run: |
           for attempt in $(seq 1 30); do
-            if curl --fail --silent --max-time 5 http://127.0.0.1:3200/ > /dev/null; then break; fi
+            if curl -fsS --max-time 5 \
+              http://127.0.0.1:3200/ > /dev/null; then
+              exit 0
+            fi
             sleep 2
           done
-          for route in / /robots.txt /sitemap.xml /blog/google-indexing-troubleshooting/; do
-            curl --fail --silent --show-error --max-time 15 "http://127.0.0.1:3200$route" > /dev/null
+
+          echo "Application did not become ready"
+          exit 1
+
+      - name: Smoke-test public routes
+        run: |
+          for route in \
+            / \
+            /robots.txt \
+            /sitemap.xml \
+            /blog/google-indexing-troubleshooting/ \
+            /google36515a0fbd6dce32.html
+          do
+            curl --fail --silent --show-error \
+              --max-time 15 \
+              "http://127.0.0.1:3200$route" > /dev/null
           done
-      - name: Container logs
+
+      - name: Print container logs on failure
         if: failure()
         run: docker logs seo-smoke || true
-      - name: Remove smoke container
+
+      - name: Remove smoke-test container
         if: always()
-        run: docker rm --force seo-smoke || true
-      - name: Publish tested image to GHCR
+        run: docker rm -f seo-smoke || true
+
+      - name: Login to GitHub Container Registry
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GHCR_TOKEN" | docker login ghcr.io \
+            --username "$GITHUB_ACTOR" \
+            --password-stdin
+
+      - name: Publish Docker image
+        env:
           IMAGE: ${{ steps.image.outputs.tag }}
         run: |
-          echo "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
           docker push "$IMAGE"
-          echo "Published: \`$IMAGE\`" >> "$GITHUB_STEP_SUMMARY"
-      - name: Registry logout
+          echo "Published: $IMAGE" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Logout from registry
         if: always()
-        run: docker logout ghcr.io
+        run: docker logout ghcr.io || true
+
+  deploy:
+    name: Deploy to Production VPS
+    needs: container
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy latest code to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          DEPLOY_SHA: ${{ github.sha }}
+        run: |
+          ssh -o StrictHostKeyChecking=yes \
+            "$VPS_USER@$VPS_HOST" \
+            "DEPLOY_SHA='$DEPLOY_SHA' bash -se" <<'EOF'
+          set -euo pipefail
+
+          cd /root/premeierseo
+
+          git fetch origin main
+          git checkout main
+          git merge --ff-only "$DEPLOY_SHA"
+
+          docker compose build web
+          docker compose up -d \
+            --no-deps \
+            --force-recreate \
+            web
+
+          docker compose ps web
+
+          for attempt in $(seq 1 20); do
+            if curl -fsS --max-time 5 \
+              http://127.0.0.1:3200/ > /dev/null; then
+              echo "Deployment health check passed"
+              exit 0
+            fi
+            sleep 3
+          done
+
+          echo "Deployment health check failed"
+          docker compose logs --tail=100 web
+          exit 1
+          EOF
