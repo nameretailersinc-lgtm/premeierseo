@@ -1,219 +1,55 @@
-name: CI and Container Delivery
+- name: Configure SSH
+  env:
+    SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+    VPS_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+  run: |
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
 
-on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-  workflow_dispatch:
+    printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    chmod 600 ~/.ssh/id_ed25519
 
-permissions:
-  contents: read
+    printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    chmod 600 ~/.ssh/known_hosts
 
-concurrency:
-  group: premierseo-${{ github.ref }}
-  cancel-in-progress: false
+- name: Deploy latest code to VPS
+  env:
+    VPS_HOST: ${{ secrets.DEPLOY_HOST }}
+    VPS_USER: ${{ secrets.DEPLOY_USER }}
+    VPS_PORT: ${{ secrets.DEPLOY_PORT }}
+    DEPLOY_SHA: ${{ github.sha }}
+  run: |
+    set -euo pipefail
 
-jobs:
-  checks:
-    name: Quality Checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    : "${VPS_HOST:?Missing DEPLOY_HOST secret}"
+    : "${VPS_USER:?Missing DEPLOY_USER secret}"
 
-    env:
-      NEXT_TELEMETRY_DISABLED: "1"
+    ssh -p "${VPS_PORT:-22}" \
+      -o BatchMode=yes \
+      -o StrictHostKeyChecking=yes \
+      "$VPS_USER@$VPS_HOST" \
+      "DEPLOY_SHA='$DEPLOY_SHA' bash -se" <<'EOF'
+    set -euo pipefail
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+    cd /root/premeierseo
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
+    git fetch origin main
+    git checkout main
+    git merge --ff-only "$DEPLOY_SHA"
 
-      - name: Install dependencies
-        run: npm ci
+    docker compose build web
+    docker compose up -d --no-deps --force-recreate web
+    docker compose ps web
 
-      - name: Run lint
-        run: npm run lint
+    for attempt in $(seq 1 20); do
+      if curl -fsS --max-time 5 http://127.0.0.1:3200/ > /dev/null; then
+        echo "Deployment health check passed"
+        exit 0
+      fi
+      sleep 3
+    done
 
-      - name: Validate project
-        run: npm run validate
-
-      - name: Run SEO tests
-        run: npm run test:seo
-
-      - name: Build Next.js
-        run: npm run build
-
-      - name: Typecheck
-        run: npm run typecheck
-
-  container:
-    name: Build and Publish Docker Image
-    needs: checks
-    if: >-
-      github.ref == 'refs/heads/main' &&
-      github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-
-    permissions:
-      contents: read
-      packages: write
-
-    env:
-      NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
-      NEXT_PUBLIC_GSC_VERIFICATION: ${{ vars.NEXT_PUBLIC_GSC_VERIFICATION }}
-      NEXT_PUBLIC_BING_VERIFICATION: ${{ vars.NEXT_PUBLIC_BING_VERIFICATION }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set immutable image tag
-        id: image
-        shell: bash
-        run: |
-          image="ghcr.io/${GITHUB_REPOSITORY,,}:sha-${GITHUB_SHA}"
-          echo "tag=$image" >> "$GITHUB_OUTPUT"
-
-      - name: Build Docker image
-        env:
-          IMAGE: ${{ steps.image.outputs.tag }}
-        run: |
-          docker build --tag "$IMAGE" \
-            --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
-            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
-            --build-arg NEXT_PUBLIC_GA_ID \
-            --build-arg NEXT_PUBLIC_GSC_VERIFICATION \
-            --build-arg NEXT_PUBLIC_BING_VERIFICATION \
-            .
-
-      - name: Start smoke-test container
-        env:
-          IMAGE: ${{ steps.image.outputs.tag }}
-        run: |
-          docker run -d \
-            --name seo-smoke \
-            --publish 127.0.0.1:3200:3000 \
-            "$IMAGE"
-
-      - name: Wait for application
-        run: |
-          for attempt in $(seq 1 30); do
-            if curl -fsS --max-time 5 \
-              http://127.0.0.1:3200/ > /dev/null; then
-              exit 0
-            fi
-            sleep 2
-          done
-
-          echo "Application did not become ready"
-          exit 1
-
-      - name: Smoke-test public routes
-        run: |
-          for route in \
-            / \
-            /robots.txt \
-            /sitemap.xml \
-            /blog/google-indexing-troubleshooting/ \
-            /google36515a0fbd6dce32.html
-          do
-            curl --fail --silent --show-error \
-              --max-time 15 \
-              "http://127.0.0.1:3200$route" > /dev/null
-          done
-
-      - name: Print container logs on failure
-        if: failure()
-        run: docker logs seo-smoke || true
-
-      - name: Remove smoke-test container
-        if: always()
-        run: docker rm -f seo-smoke || true
-
-      - name: Login to GitHub Container Registry
-        env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$GHCR_TOKEN" | docker login ghcr.io \
-            --username "$GITHUB_ACTOR" \
-            --password-stdin
-
-      - name: Publish Docker image
-        env:
-          IMAGE: ${{ steps.image.outputs.tag }}
-        run: |
-          docker push "$IMAGE"
-          echo "Published: $IMAGE" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Logout from registry
-        if: always()
-        run: docker logout ghcr.io || true
-
-  deploy:
-    name: Deploy to Production VPS
-    needs: container
-    if: >-
-      github.ref == 'refs/heads/main' &&
-      github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-
-    steps:
-      - name: Configure SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
-      - name: Deploy latest code to VPS
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          DEPLOY_SHA: ${{ github.sha }}
-        run: |
-          ssh -o StrictHostKeyChecking=yes \
-            "$VPS_USER@$VPS_HOST" \
-            "DEPLOY_SHA='$DEPLOY_SHA' bash -se" <<'EOF'
-          set -euo pipefail
-
-          cd /root/premeierseo
-
-          git fetch origin main
-          git checkout main
-          git merge --ff-only "$DEPLOY_SHA"
-
-          docker compose build web
-          docker compose up -d \
-            --no-deps \
-            --force-recreate \
-            web
-
-          docker compose ps web
-
-          for attempt in $(seq 1 20); do
-            if curl -fsS --max-time 5 \
-              http://127.0.0.1:3200/ > /dev/null; then
-              echo "Deployment health check passed"
-              exit 0
-            fi
-            sleep 3
-          done
-
-          echo "Deployment health check failed"
-          docker compose logs --tail=100 web
-          exit 1
-          EOF
+    echo "Deployment health check failed"
+    docker compose logs --tail=100 web
+    exit 1
+    EOF
