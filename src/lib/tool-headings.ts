@@ -28,12 +28,24 @@ function isQuestion(name: string) {
   return name.includes("?");
 }
 
+/** Question-style names get their own wording so no two pages share a generic heading. */
+const QUESTION_NAME_HEADINGS: Record<string, { howTo: string; questions: string }> = {
+  "Is It Down? Website Down Checker": {
+    howTo: "How to check if a website is down",
+    questions: "Questions about the website down checker",
+  },
+  "What Is My Browser?": {
+    howTo: "How to check which browser you're using",
+    questions: "Questions about browser detection",
+  },
+};
+
 export function howToHeading(name: string) {
-  if (isQuestion(name)) return "How to use this tool";
+  if (isQuestion(name)) return QUESTION_NAME_HEADINGS[name]?.howTo ?? "How to use this tool";
   return isAction(name) ? `How to ${lcFirst(name)}` : `How to use the ${lcFirst(name)}`;
 }
 
 export function questionsHeading(name: string) {
-  if (isQuestion(name)) return "Questions about this tool";
+  if (isQuestion(name)) return QUESTION_NAME_HEADINGS[name]?.questions ?? "Questions about this tool";
   return isAction(name) ? `Questions about how to ${lcFirst(name)}` : `Questions about the ${lcFirst(name)}`;
 }

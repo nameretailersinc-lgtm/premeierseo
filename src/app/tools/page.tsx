@@ -80,7 +80,7 @@ export default function ToolsIndex() {
           {letters.map((l) => (
             <section key={l} aria-labelledby={`letter-${l}`} data-hub-group className="grid gap-3 md:grid-cols-[4rem_minmax(0,1fr)]">
               <h2 id={`letter-${l}`} className="scroll-mt-24 text-3xl font-extrabold text-ink-disabled md:pt-2">
-                <span aria-hidden="true">{l}</span>
+                <span aria-hidden="true">{l}</span>{" "}
                 <span className="sr-only">Tools starting with {l}</span>
               </h2>
               <ToolList tools={sorted.filter((t) => groupKey(t.name) === l)} />
