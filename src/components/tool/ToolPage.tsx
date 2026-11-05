@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ToolMark } from "@/components/cards";
 import { FaqList } from "@/components/Faq";
 import { Icon } from "@/components/Icon";
+import { PrefillLink } from "@/components/PrefillLink";
 import { JsonLd } from "@/components/JsonLd";
 import { InlineMd, Markdown } from "@/components/Markdown";
 import { CATEGORY_BY_ID } from "@/content/categories";
@@ -276,13 +277,14 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
                   </Link>
                 </span>
               </p>
-              <Link
-                href={`/tool-complain/?tool=${tool.id}`}
+              <PrefillLink
+                href="/tool-complain/"
+                prefill={{ tool: tool.id }}
                 className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
               >
                 <Icon name="message" size={15} />
                 Report a problem
-              </Link>
+              </PrefillLink>
             </div>
           </div>
 

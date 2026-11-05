@@ -288,7 +288,7 @@ export const TEXT_TOOLS: ToolDef[] = [
     h1: "Find and Replace Text",
     title: "Find and Replace Text Online – With Regex and Bulk Rules",
     metaDescription:
-      "Find and replace words or phrases in any text, run several replacements in one pass, match case or whole words, and use regular expressions when needed.",
+      "Find and replace words or phrases in any text, run several replacements in one pass, match case or whole words, and use regular expressions.",
     summary:
       "Find words or phrases in any text and replace them, with several rules applied in one pass, match-case and whole-word options, and regular expressions when you need patterns.",
     category: "text-tools",
@@ -554,7 +554,7 @@ export const TEXT_TOOLS: ToolDef[] = [
     h1: "Remove Extra Spaces",
     title: "Remove Extra Spaces – Fix Double Spaces and Tabs",
     metaDescription:
-      "Collapse double spaces, trim leading and trailing whitespace, convert tabs and remove non-breaking spaces from text. See how many spaces were removed.",
+      "Collapse double spaces, trim leading and trailing whitespace, convert tabs and remove non-breaking spaces. See how many spaces were removed.",
     summary:
       "Collapse double spaces, trim spaces at the start and end of lines, and convert tabs and non-breaking spaces, with a count of the spaces removed.",
     category: "text-tools",
@@ -2598,7 +2598,7 @@ export const TEXT_TOOLS: ToolDef[] = [
     h1: "Word Combiner",
     title: "Word Combiner – Blend Words or Combine Word Lists",
     metaDescription:
-      "Blend two words into new names (brunch, smog) or combine two lists of words into every pairing for keyword, product and domain ideas. Copy or download.",
+      "Blend two words into new names (brunch, smog) or combine two word lists into every pairing for keyword, product and domain ideas.",
     summary:
       "Blend two words into new names, the way breakfast and lunch make brunch, or combine lists of words into every pairing for keyword, product and domain ideas.",
     category: "text-tools",

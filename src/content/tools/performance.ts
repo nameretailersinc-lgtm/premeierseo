@@ -133,7 +133,7 @@ export const PERFORMANCE_TOOLS: ToolDef[] = [
     h1: "Page Size Checker",
     title: "Page Size Checker – HTML Size and Total Page Weight",
     metaDescription:
-      "Check how heavy a web page is: compressed and uncompressed HTML size, plus total weight and request count of everything it loads, via PageSpeed Insights.",
+      "Check how heavy a web page is: compressed and uncompressed HTML size, plus total page weight and request count via PageSpeed Insights.",
     summary:
       "Measure a page's HTML size as transferred and uncompressed, see whether compression is on, and optionally measure the total weight and number of requests of everything the page loads.",
     category: "traffic-performance-tools",
@@ -228,7 +228,7 @@ export const PERFORMANCE_TOOLS: ToolDef[] = [
     h1: "Mobile-Friendly Test",
     title: "Mobile-Friendly Test – Check Any Page on Phone Screens",
     metaDescription:
-      "Check whether a page works on phones: viewport tag, zoom settings and Lighthouse mobile audits for text size, with a screenshot and a phone-size preview.",
+      "Check whether a page works on phones: viewport tag, zoom settings and Lighthouse mobile audits, with a screenshot and a phone-size preview.",
     summary:
       "Check whether a page is set up for phones (viewport tag, zoom, language, embeds) and, optionally, run Google's Lighthouse mobile test for text size, a mobile score and a screenshot, plus a phone-size preview.",
     category: "traffic-performance-tools",
@@ -397,7 +397,7 @@ export const PERFORMANCE_TOOLS: ToolDef[] = [
     h1: "Website Uptime Checker",
     title: "Website Uptime Checker – Is Your Site Up Right Now?",
     metaDescription:
-      "Check whether your site responds right now, with status code, response time and page title. Learn what uptime percentages mean and how monitoring works.",
+      "Check whether your site responds right now, with status code, response time and page title. Learn what uptime percentages mean.",
     summary:
       "Check whether your website responds right now, from our server: status code, response time, time to first byte and page title, with a plain verdict. A one-off check, not continuous monitoring.",
     category: "traffic-performance-tools",

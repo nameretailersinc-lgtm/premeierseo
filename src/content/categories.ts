@@ -144,7 +144,7 @@ export const CATEGORIES: CategoryDef[] = [
     h1: "Image Tools",
     title: "Image Tools – Compress, Resize, Convert and Crop Images",
     metaDescription:
-      "Compress images to an exact KB size, resize and crop photos, and convert between JPG, PNG, WebP, HEIC, AVIF, SVG and ICO. Most tools run in your browser.",
+      "Compress images to an exact KB size, resize and crop photos, and convert JPG, PNG, WebP, HEIC, AVIF, SVG and ICO. Runs in your browser.",
     intro:
       "Compress photos to an exact file size for upload forms, resize and crop images, and convert between JPG, PNG, WebP, HEIC, AVIF, SVG and ICO. The image tools process files in your browser: your images are not uploaded to our server.",
     card: "Compress to an exact KB size, resize, crop and convert images.",
@@ -189,7 +189,7 @@ export const CATEGORIES: CategoryDef[] = [
     h1: "Developer Tools",
     title: "Developer Tools – Formatters, Encoders, JSON and Regex",
     metaDescription:
-      "Format and minify HTML, CSS and JavaScript, view and convert JSON and CSV, test regex, convert timestamps, encode URLs and Base64, and generate UUIDs.",
+      "Format and minify HTML, CSS and JavaScript, view and convert JSON and CSV, test regex, convert timestamps, encode Base64 and generate UUIDs.",
     intro:
       "Everyday utilities for web developers and site owners: format and minify code, view and convert JSON and CSV, test regular expressions, encode and decode URLs and Base64, convert Unix timestamps, generate hashes and UUIDs, and work with colours and .htaccess rules. Code you paste is processed in your browser.",
     card: "Format code, convert JSON and CSV, test regex, encode and hash.",

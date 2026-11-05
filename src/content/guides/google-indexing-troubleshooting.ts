@@ -4,7 +4,7 @@ export const googleIndexingTroubleshooting = defineGuide({
   slug: "google-indexing-troubleshooting",
   title: "Website Not Showing on Google? Indexing Troubleshooting",
   h1: "How to investigate a website not showing on Google",
-  metaDescription: "Diagnose Google indexing problems using HTTP status, robots rules, canonical tags, rendered content and Search Console. Follow a practical repair checklist.",
+  metaDescription: "Diagnose Google indexing problems using HTTP status, robots rules, canonical tags, rendered content and Search Console. A repair checklist.",
   summary: "Separate discovery, crawling, indexing and ranking before changing your site. Technical eligibility does not guarantee indexing. Start with one important URL and record evidence for each check.",
   cluster: "Technical SEO",
   datePublished: "2026-10-15",

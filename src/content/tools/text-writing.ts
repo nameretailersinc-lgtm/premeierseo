@@ -30,7 +30,7 @@ export const WRITING_TOOLS: ToolDef[] = [
     h1: "Spell Checker",
     title: "Spell Checker – Check Spelling Online With Suggestions",
     metaDescription:
-      "Paste text to find misspelled words and get suggestions from a US English Hunspell dictionary, with an option to accept British spellings. Runs in your browser.",
+      "Paste text to find misspelled words and get suggestions from a US English Hunspell dictionary, with a British spelling option. Runs in your browser.",
     summary:
       "Find misspelled words in any text and fix them with one click, using a full Hunspell US English dictionary that runs in your browser. Add your own words, or accept British spellings such as colour.",
     category: "text-tools",

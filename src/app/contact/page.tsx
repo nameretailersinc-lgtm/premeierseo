@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
 
 const TITLE = "Contact Premier SEO Services";
 const DESCRIPTION =
-  "Contact the team behind Premier SEO Services: ask about a tool, suggest a new one or send a correction. Email info@premierseoservices.com or use the form.";
+  "Contact Premier SEO Services: ask about a tool, suggest a new one or send a correction. Email info@premierseoservices.com or use the form.";
 
 export const metadata: Metadata = buildMetadata({ path: "/contact/", title: TITLE, description: DESCRIPTION });
 

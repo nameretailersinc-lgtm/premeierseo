@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
+import { PrefillLink } from "@/components/PrefillLink";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ToolList } from "@/components/cards";
 import { HubFilter } from "@/components/HubFilter";
@@ -14,13 +15,17 @@ import { buildMetadata } from "@/lib/seo";
 
 const TITLE = "All Tools A–Z | Premier SEO Services";
 const DESCRIPTION =
-  "Every free tool on Premier SEO Services in one list: text, SEO, image, PDF, developer, website, calculator and generator tools, with a one-line description of each.";
+  "Every free tool on Premier SEO Services in one A–Z list: text, SEO, image, PDF, developer, website and calculator tools, each described.";
 
 export const metadata: Metadata = buildMetadata({ path: "/tools/", title: TITLE, description: DESCRIPTION });
 
 export default function ToolsIndex() {
-  const sorted = [...TOOLS].sort((a, b) => a.name.localeCompare(b.name));
-  const letters = [...new Set(sorted.map((t) => t.name[0].toUpperCase()))];
+  // Group by the first letter or digit, so ".htaccess Tester" files under H rather than under ".".
+  const groupKey = (name: string) => (name.replace(/^[^\p{L}\p{N}]+/u, "")[0] ?? name[0]).toUpperCase();
+  const sorted = [...TOOLS].sort((a, b) =>
+    a.name.replace(/^[^\p{L}\p{N}]+/u, "").localeCompare(b.name.replace(/^[^\p{L}\p{N}]+/u, "")),
+  );
+  const letters = [...new Set(sorted.map((t) => groupKey(t.name)))];
   const crumbs = [{ name: "Home", path: "/" }, { name: "All tools" }];
   return (
     <>
@@ -75,17 +80,18 @@ export default function ToolsIndex() {
           {letters.map((l) => (
             <section key={l} aria-labelledby={`letter-${l}`} data-hub-group className="grid gap-3 md:grid-cols-[4rem_minmax(0,1fr)]">
               <h2 id={`letter-${l}`} className="scroll-mt-24 text-3xl font-extrabold text-ink-disabled md:pt-2">
-                {l}
+                <span aria-hidden="true">{l}</span>
+                <span className="sr-only">Tools starting with {l}</span>
               </h2>
-              <ToolList tools={sorted.filter((t) => t.name[0].toUpperCase() === l)} />
+              <ToolList tools={sorted.filter((t) => groupKey(t.name) === l)} />
             </section>
           ))}
         </div>
         <p id="hub-filter-empty" hidden className="card mt-6 p-6 text-center text-ink-2">
           No tools match. Try a shorter word, or{" "}
-          <Link href="/contact/?topic=tool-request" className="font-semibold text-accent underline">
+          <PrefillLink href="/contact/" prefill={{ topic: "tool-request" }} className="font-semibold text-accent underline">
             suggest a tool
-          </Link>
+          </PrefillLink>
           .
         </p>
       </div>

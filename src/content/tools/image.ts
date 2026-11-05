@@ -1191,7 +1191,7 @@ export const IMAGE_TOOLS: ToolDef[] = [
     h1: "Favicon Generator",
     title: "Favicon Generator – ICO, PNG and Apple Touch Icons",
     metaDescription:
-      "Turn an image, text or emoji into a favicon set (favicon.ico, PNGs from 16 to 512px, an Apple touch icon and a web manifest) plus the HTML tags to paste in.",
+      "Turn an image, text or emoji into a favicon set: favicon.ico, PNGs from 16 to 512px, an Apple touch icon and a web manifest, plus the HTML tags.",
     summary:
       "Make a complete favicon set from an image, a letter or an emoji: favicon.ico, PNG icons from 16 to 512 px, an Apple touch icon, a web manifest and the HTML tags for your site.",
     subgroup: "icons",

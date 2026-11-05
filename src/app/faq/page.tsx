@@ -7,7 +7,7 @@ import { buildMetadata } from "@/lib/seo";
 
 const TITLE = "FAQ – Using the Free Tools | Premier SEO Services";
 const DESCRIPTION =
-  "Answers about Premier SEO Services: whether the tools are free, what happens to your files, why some tools use our server, accuracy, and how to report a problem.";
+  "Answers about Premier SEO Services: are the tools free, what happens to your files, why some tools use our server, and how to report a problem.";
 
 export const metadata: Metadata = buildMetadata({ path: "/faq/", title: TITLE, description: DESCRIPTION });
 
@@ -60,7 +60,7 @@ const GROUPS = [
       },
       {
         q: "Can you build a tool I need?",
-        a: "Suggest it through the [contact page](/contact/?topic=tool-request). We can't promise every request, but requests decide what we build next.",
+        a: "Suggest it through the [contact page](/contact/). We can't promise every request, but requests decide what we build next.",
       },
     ],
   },

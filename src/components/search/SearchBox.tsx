@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PrefillLink } from "@/components/PrefillLink";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/Icon";
@@ -266,9 +267,9 @@ export function SearchBox({
             <p className="font-semibold text-ink">No tools match “{q}”.</p>
             <p className="mt-1">
               Try fewer words, <Link className="text-accent underline" href="/tools/">browse all tools</Link>, or{" "}
-              <Link className="text-accent underline" href="/contact/?topic=tool-request">
+              <PrefillLink className="text-accent underline" href="/contact/" prefill={{ topic: "tool-request" }}>
                 suggest a tool
-              </Link>
+              </PrefillLink>
               .
             </p>
           </div>

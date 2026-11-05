@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
 
 const TITLE = "Privacy Policy | Premier SEO Services";
 const DESCRIPTION =
-  "How Premier SEO Services handles data: most tools run in your browser, website checkers fetch pages from our server, and we use no advertising or tracking cookies.";
+  "How we handle data: most tools run in your browser, website checkers fetch pages from our server, and we use no advertising or tracking cookies.";
 
 export const metadata: Metadata = buildMetadata({ path: "/privacy-policy/", title: TITLE, description: DESCRIPTION });
 

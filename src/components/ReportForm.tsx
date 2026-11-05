@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { Icon } from "./Icon";
 import { track } from "@/lib/analytics";
+import { PREFILL_KEY } from "./PrefillLink";
 
 const REASONS = [
   ["wrong-result", "Wrong result"],
@@ -34,10 +35,20 @@ export function ReportForm({ kind, tools, email }: { kind: "problem" | "contact"
   const [errMsg, setErrMsg] = useState("");
 
   useEffect(() => {
+    // Prefill comes from PrefillLink (sessionStorage) or, for older shared links, the query string.
+    let stored: { tool?: string; topic?: string } = {};
+    try {
+      stored = JSON.parse(sessionStorage.getItem(PREFILL_KEY) ?? "{}");
+      sessionStorage.removeItem(PREFILL_KEY);
+    } catch {
+      /* ignore */
+    }
     const p = new URLSearchParams(window.location.search);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- prefill from query after mount (static page)
-    if (p.get("tool")) setTool(p.get("tool")!);
-    if (p.get("topic")) setTopic(p.get("topic")!);
+    const t = p.get("tool") ?? stored.tool;
+    const tp = p.get("topic") ?? stored.topic;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- prefill after mount (static page)
+    if (t) setTool(t);
+    if (tp) setTopic(tp);
   }, []);
 
   if (state === "sent") {

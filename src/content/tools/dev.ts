@@ -1193,7 +1193,7 @@ export const DEV_TOOLS: ToolDef[] = [
     h1: "URL Encoder / Decoder",
     title: "URL Encoder / Decoder – Percent-Encode or Decode URLs",
     metaDescription:
-      "Percent-encode text for URLs and query strings, or decode %-encoded URLs back to readable text. Choose encodeURIComponent or encodeURI and see URL parts.",
+      "Percent-encode text for URLs and query strings, or decode %-encoded URLs back to readable text. Choose encodeURIComponent or encodeURI.",
     summary:
       "Percent-encode text for URLs and query strings, decode %XX sequences back to readable text, or break a URL into its scheme, host, path and query parameters.",
     category: "development-tools",

@@ -185,9 +185,9 @@ export const OTHER_TOOLS: ToolDef[] = [
     path: "/password-generator/",
     name: "Password Generator",
     h1: "Password Generator",
-    title: "Password Generator – Strong Random Passwords and Passphrases",
+    title: "Password Generator – Strong Random Passwords",
     metaDescription:
-      "Create strong random passwords or memorable passphrases in your browser with a cryptographically secure generator. Set length, symbols and exclusions.",
+      "Create strong random passwords or memorable passphrases in your browser with a secure generator. Set length, symbols and exclusions.",
     summary:
       "Create strong random passwords or memorable passphrases in your browser, with the strength shown in bits of entropy. Nothing is stored or sent anywhere.",
     category: "other-tools",
@@ -270,7 +270,7 @@ export const OTHER_TOOLS: ToolDef[] = [
     h1: "Test Credit Card Number Generator",
     title: "Test Credit Card Number Generator – Luhn-Valid Dummy Cards",
     metaDescription:
-      "Generate Luhn-valid dummy card numbers for testing form validation. They aren't real accounts and won't pass payment authorization. For developers and QA.",
+      "Generate Luhn-valid dummy card numbers for testing form validation. They aren't real accounts and can't pay for anything. For developers and QA.",
     summary:
       "Generate Luhn-valid dummy card numbers with real network prefixes for testing form validation, and check any number's Luhn checksum. They aren't real cards and can't be used to pay.",
     category: "other-tools",
@@ -584,7 +584,7 @@ export const OTHER_TOOLS: ToolDef[] = [
     h1: "Find Facebook Page ID",
     title: "Find Facebook ID – Get a Page or Profile's Numeric ID",
     metaDescription:
-      "Extract the numeric ID of a Facebook Page or profile from a URL or pasted page source, or use the manual method in Page settings. Nothing is sent to Facebook.",
+      "Extract the numeric ID of a Facebook Page or profile from a URL or pasted page source, or use the manual method. Nothing is sent to Facebook.",
     summary:
       "Pull the numeric ID of a Facebook Page, profile or group out of a URL or the page's source code, or follow the manual steps. It works offline and never contacts Facebook.",
     category: "other-tools",
