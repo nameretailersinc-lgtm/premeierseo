@@ -902,6 +902,10 @@ export const IMAGE_TOOLS: ToolDef[] = [
         a: "Yes. Each save rounds away detail again, so repeated compression adds damage. Always compress from the original file, and keep the original.",
       },
       {
+        q: "Is this a JPEG optimizer?",
+        a: "In the everyday sense, yes: it makes JPEG (or JPG) files smaller, and some people search for it as a JPEG optimiser. It does that by re-encoding the photo at the quality you choose, which is lossy. A lossless optimizer such as jpegtran rewrites the file without touching pixels, but typically saves only a few percent. Use this tool when you want a clearly smaller file and can accept a small, controllable loss of detail.",
+      },
+      {
         q: "Is EXIF location data removed?",
         a: "Yes. Saved files contain only the image, without GPS location, camera details or date taken.",
       },

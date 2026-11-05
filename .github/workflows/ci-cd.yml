@@ -167,26 +167,45 @@ jobs:
     steps:
       - name: Configure SSH
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          CHECK_DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          CHECK_DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
+          missing=0
+          for name in DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS DEPLOY_HOST DEPLOY_USER; do
+            case "$name" in
+              DEPLOY_SSH_KEY) value="$SSH_PRIVATE_KEY" ;;
+              DEPLOY_KNOWN_HOSTS) value="$DEPLOY_KNOWN_HOSTS" ;;
+              DEPLOY_HOST) value="$CHECK_DEPLOY_HOST" ;;
+              DEPLOY_USER) value="$CHECK_DEPLOY_USER" ;;
+            esac
+            if [ -z "$value" ]; then
+              echo "::error::Repository secret $name is empty or not set (Settings > Secrets and variables > Actions)"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
       - name: Deploy latest code to VPS
         env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_SHA: ${{ github.sha }}
         run: |
           ssh -o StrictHostKeyChecking=yes \
-            "$VPS_USER@$VPS_HOST" \
+            -p "${DEPLOY_PORT:-22}" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
             "DEPLOY_SHA='$DEPLOY_SHA' bash -se" <<'EOF'
           set -euo pipefail
 
