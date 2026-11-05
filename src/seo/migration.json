@@ -1,6 +1,10 @@
 {
  "redirects": {
   "/website-management-tools/": "/development-tools/",
+  "/tools/geo-ip-locator/": "/ip-address-lookup/",
+  "/tools/http-status-checker/": "/http-status-checker/",
+  "/tools/traffic-performance-tools/": "/traffic-performance-tools/",
+  "/tools/age-calculator/": "/age-calculator/",
   "/replace-lines-containing/": "/find-and-replace-text/",
   "/string-randomizer/": "/random-string-generator/",
   "/line-combination-generator/": "/combination-generator/",
