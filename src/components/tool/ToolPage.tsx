@@ -14,6 +14,7 @@ import type { Archetype, ToolDef } from "@/lib/types";
 import { ToolWidget } from "@/tools/registry";
 import { privacyStatement } from "./privacy";
 import { toolHue } from "@/lib/tool-icon";
+import { howToHeading, questionsHeading } from "@/lib/tool-headings";
 
 function formatDate(iso: string) {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
@@ -155,7 +156,7 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
             <article className="card prose-body max-w-none p-5 sm:p-7 lg:p-9 [&>h2:first-child]:mt-0">
               {tool.steps.length > 0 && (
                 <>
-                  <h2 id="how-to-use">How to use the {lcFirst(tool.name)}</h2>
+                  <h2 id="how-to-use">{howToHeading(tool.name)}</h2>
                   <ol className="steps not-prose mt-5">
                     {tool.steps.map((s, i) => (
                       <li key={i} className="mt-0 text-ink-2">
@@ -241,7 +242,7 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
               )}
             </article>
 
-            <FaqList items={tool.faq} heading={`Questions about the ${lcFirst(tool.name)}`} />
+            <FaqList items={tool.faq} heading={questionsHeading(tool.name)} />
 
             {guides.length > 0 && (
               <section aria-labelledby="learn-more" className="mt-12">
@@ -340,14 +341,6 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
       </div>
     </>
   );
-}
-
-/** "Word Counter" → "word counter"; keeps acronyms and codes (PDF, JPG, 50KB, ROT13, .htaccess). */
-function lcFirst(s: string) {
-  return s
-    .split(" ")
-    .map((w) => (/^[A-Z][a-z]+$/.test(w) ? w.toLowerCase() : w))
-    .join(" ");
 }
 
 function privacyHeading(t: ToolDef) {

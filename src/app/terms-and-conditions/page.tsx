@@ -12,7 +12,7 @@ const DESCRIPTION =
 export const metadata: Metadata = buildMetadata({ path: "/terms-and-conditions/", title: TITLE, description: DESCRIPTION });
 
 const SECTIONS = [
-  ["using-the-tools", "Using the tools"],
+  ["using-the-tools", "Terms for using the tools"],
   ["acceptable-use", "Acceptable use"],
   ["no-warranty", "No warranty"],
   ["liability", "Liability"],
@@ -74,7 +74,7 @@ export default function TermsPage() {
         </>
       }
     >
-      <h2 id="using-the-tools">Using the tools</h2>
+      <h2 id="using-the-tools">Terms for using the tools</h2>
       <p>
         The tools are free for personal and commercial use. You don&apos;t need an account. You keep all rights to the text, files and
         results you create with them.
