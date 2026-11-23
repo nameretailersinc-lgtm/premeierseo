@@ -16,9 +16,7 @@ services:
       # Blog admin at /admin/: set both in the server's .env (admin stays disabled while ADMIN_PASSWORD is empty).
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
-    volumes:
-      # Blog posts + uploaded images. Named volume: survives `docker compose build/up` on every deploy.
-      - blog-data:/app/data
-
-volumes:
-  blog-data:
+      # Blog posts and images (GridFS) are stored in MongoDB: Atlas or self-hosted.
+      # e.g. mongodb+srv://user:pass@cluster0.xxxx.mongodb.net/premierseo?retryWrites=true&w=majority
+      MONGODB_URI: ${MONGODB_URI:-}
+      MONGODB_DB: ${MONGODB_DB:-}

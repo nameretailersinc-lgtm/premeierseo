@@ -7,4 +7,3 @@ scripts/*.py
 *.tsbuildinfo
 .env*
 npm-debug.log*
-data

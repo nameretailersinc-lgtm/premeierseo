@@ -1,14 +1,12 @@
 import { randomBytes } from "node:crypto";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { requireAdminApi } from "@/lib/server/admin-auth";
-import { UPLOAD_DIR } from "@/lib/server/blog-store";
+import { ValidationError, saveImage } from "@/lib/server/blog-store";
 import { sniffImage } from "@/lib/server/image-meta";
 import { LIMITS, slugifyPost } from "@/lib/blog-types";
 
 const H = { "Cache-Control": "no-store", "X-Robots-Tag": "noindex" };
 
-/** multipart/form-data: file (JPG, PNG, WebP or GIF, ≤ 5 MB), optional name (used for an SEO-friendly filename). */
+/** multipart/form-data: file (JPG, PNG, WebP or GIF, ≤ 5 MB), optional name (used for an SEO-friendly filename). Stored in MongoDB GridFS. */
 export async function POST(req: Request) {
   const deny = requireAdminApi(req);
   if (deny) return deny;
@@ -31,11 +29,13 @@ export async function POST(req: Request) {
   const base = slugifyPost(String(form.get("name") || file.name.replace(/\.[^.]+$/, ""))).slice(0, 60) || "image";
   const now = new Date();
   const dir = `${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
-  const name = `${base}-${randomBytes(4).toString("hex")}.${info.ext}`;
-  await fs.mkdir(path.join(UPLOAD_DIR, dir), { recursive: true });
-  await fs.writeFile(path.join(UPLOAD_DIR, dir, name), buf, { flag: "wx" });
-  return Response.json(
-    { src: `/media/uploads/${dir}/${name}`, width: info.width, height: info.height, bytes: buf.length, mime: info.mime },
-    { status: 201, headers: H },
-  );
+  const filename = `uploads/${dir}/${base}-${randomBytes(4).toString("hex")}.${info.ext}`;
+  try {
+    await saveImage(filename, buf, { mime: info.mime, width: info.width, height: info.height });
+  } catch (e) {
+    if (e instanceof ValidationError) return Response.json({ error: e.message }, { status: 503, headers: H });
+    console.error("[admin] image upload failed", e);
+    return Response.json({ error: "Could not store the image." }, { status: 500, headers: H });
+  }
+  return Response.json({ src: `/media/${filename}`, width: info.width, height: info.height, bytes: buf.length, mime: info.mime }, { status: 201, headers: H });
 }

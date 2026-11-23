@@ -74,7 +74,10 @@ const FAQ = [
 ];
 
 export default async function HomePage() {
-  const posts = (await listPublishedPosts()).filter((p) => !p.seo.noindex).slice(0, 3);
+  // The homepage must never fail because the blog database is unreachable.
+  const posts = await listPublishedPosts()
+    .then((all) => all.filter((p) => !p.seo.noindex).slice(0, 3))
+    .catch((e) => (console.error("[home] blog posts unavailable", e), []));
   return (
     <>
       <JsonLd graph={homeGraph(TITLE, DESCRIPTION)} />

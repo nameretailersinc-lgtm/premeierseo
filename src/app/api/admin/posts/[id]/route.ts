@@ -34,7 +34,14 @@ export async function PUT(req: Request, { params }: Ctx) {
 export async function DELETE(req: Request, { params }: Ctx) {
   const deny = requireAdminApi(req);
   if (deny) return deny;
-  const gone = await deletePost((await params).id);
+  let gone;
+  try {
+    gone = await deletePost((await params).id);
+  } catch (e) {
+    if (e instanceof ValidationError) return Response.json({ error: e.message }, { status: 503, headers: H });
+    console.error("[admin] delete post failed", e);
+    return Response.json({ error: "Could not delete the post." }, { status: 500, headers: H });
+  }
   if (!gone) return Response.json({ error: "Not found." }, { status: 404, headers: H });
   revalidateBlog([gone.slug]);
   return Response.json({ ok: true }, { headers: H });

@@ -52,4 +52,3 @@ next-env.d.ts
 # QA reports
 /docs/qa/
 /scripts/qa/
-/data/

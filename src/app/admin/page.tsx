@@ -4,6 +4,7 @@ import { PostTable } from "@/components/admin/PostTable";
 import { seoChecks, seoScore } from "@/lib/blog-types";
 import { requireAdminPage } from "@/lib/server/admin-auth";
 import { listAllPosts } from "@/lib/server/blog-store";
+import { mongoConfigured } from "@/lib/server/mongo";
 
 export default async function AdminHome() {
   await requireAdminPage();
@@ -30,6 +31,11 @@ export default async function AdminHome() {
           + New post
         </Link>
       </AdminHeader>
+      {!mongoConfigured() && (
+        <p className="mb-4 rounded-xl border border-[#b4531855] bg-[#b4531812] p-4 text-sm font-medium text-[#b45309]">
+          Blog storage is not configured. Set <code>MONGODB_URI</code> (and optionally <code>MONGODB_DB</code>) on the server, then restart.
+        </p>
+      )}
       <PostTable rows={rows} />
     </>
   );

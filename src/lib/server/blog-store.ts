@@ -1,8 +1,8 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { promises as fs } from "node:fs";
-import path from "node:path";
+import { GridFSBucket, type Collection } from "mongodb";
 import { getTool } from "@/content/tools";
+import { getDb, mongoConfigured } from "./mongo";
 import {
   LIMITS,
   SCHEMA_TYPES,
@@ -16,99 +16,131 @@ import {
 } from "@/lib/blog-types";
 
 /*
- * File-backed blog store: DATA_DIR/posts.json plus DATA_DIR/uploads/ for images.
- * In Docker, DATA_DIR (/app/data) is a named volume so posts survive rebuilds and deploys.
- * Writes are serialised in-process and replace the file atomically (write temp + rename).
+ * MongoDB blog store.
+ *   posts:        collection "blog_posts" (_id = post id, unique index on slug)
+ *   images:       GridFS bucket "blog_images" (filename = "uploads/YYYY/MM/name.ext", served by /media/…)
+ * When MONGODB_URI is not set, public reads return nothing (so builds and CI smoke tests work without a
+ * database) and admin writes fail with a clear message.
  */
 
-export const DATA_DIR = path.resolve(/*turbopackIgnore: true*/ process.env.BLOG_DATA_DIR || path.join(process.cwd(), "data"));
-export const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
-const FILE = path.join(DATA_DIR, "posts.json");
+type PostDoc = Omit<BlogPost, "id"> & { _id: string };
 
-let cache: { mtime: number; posts: BlogPost[] } | null = null;
-let queue: Promise<unknown> = Promise.resolve();
+const toPost = ({ _id, ...rest }: PostDoc): BlogPost => normalize({ ...rest, id: _id } as Partial<BlogPost>);
+const toDoc = ({ id, ...rest }: BlogPost): PostDoc => ({ _id: id, ...rest });
 
-async function readAll(): Promise<BlogPost[]> {
-  try {
-    const st = await fs.stat(FILE);
-    if (cache && cache.mtime === st.mtimeMs) return cache.posts;
-    const raw = JSON.parse(await fs.readFile(FILE, "utf8")) as { posts?: unknown[] };
-    const posts = (raw.posts ?? []).map((p) => normalize(p as Partial<BlogPost>));
-    cache = { mtime: st.mtimeMs, posts };
-    return posts;
-  } catch (e) {
-    if ((e as NodeJS.ErrnoException).code === "ENOENT") return [];
+let indexes: Promise<unknown> | null = null;
+
+async function posts(): Promise<Collection<PostDoc>> {
+  const db = await getDb();
+  const col = db.collection<PostDoc>("blog_posts");
+  indexes ??= Promise.all([
+    col.createIndex({ slug: 1 }, { unique: true, name: "slug_unique" }),
+    col.createIndex({ status: 1, datePublished: -1 }, { name: "published_by_date" }),
+    col.createIndex({ dateModified: -1 }, { name: "modified" }),
+  ]).catch((e) => {
+    indexes = null;
     throw e;
-  }
+  });
+  await indexes;
+  return col;
 }
 
-async function writeAll(posts: BlogPost[]) {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  const tmp = `${FILE}.${process.pid}.${Date.now()}.tmp`;
-  await fs.writeFile(tmp, JSON.stringify({ version: 1, posts }, null, 2), "utf8");
-  await fs.rename(tmp, FILE);
-  cache = null;
-}
+export class ValidationError extends Error {}
 
-function locked<T>(fn: () => Promise<T>): Promise<T> {
-  const run = queue.then(fn, fn);
-  queue = run.catch(() => undefined);
-  return run;
+function requireDb() {
+  if (!mongoConfigured()) throw new ValidationError("Blog storage is not configured: set MONGODB_URI on the server.");
 }
 
 /* ---------- reads ---------- */
 
-const byDateDesc = (a: BlogPost, b: BlogPost) => (b.datePublished || b.createdAt).localeCompare(a.datePublished || a.createdAt);
-
 export async function listAllPosts(): Promise<BlogPost[]> {
-  return [...(await readAll())].sort((a, b) => b.dateModified.localeCompare(a.dateModified));
+  if (!mongoConfigured()) return [];
+  return (await (await posts()).find({}).sort({ dateModified: -1 }).toArray()).map(toPost);
 }
 
 /** Published posts whose publish date has arrived (a future date acts as scheduling). */
 export async function listPublishedPosts(): Promise<BlogPost[]> {
+  if (!mongoConfigured()) return [];
   const now = new Date().toISOString();
-  return (await readAll()).filter((p) => p.status === "published" && p.datePublished <= now).sort(byDateDesc);
+  const docs = await (await posts())
+    .find({ status: "published", datePublished: { $lte: now, $ne: "" } })
+    .sort({ datePublished: -1 })
+    .toArray();
+  return docs.map(toPost);
 }
 
 export async function getPostById(id: string): Promise<BlogPost | undefined> {
-  return (await readAll()).find((p) => p.id === id);
+  if (!mongoConfigured()) return undefined;
+  const doc = await (await posts()).findOne({ _id: String(id) });
+  return doc ? toPost(doc) : undefined;
 }
 
 export async function getPublishedPost(slug: string): Promise<BlogPost | undefined> {
-  return (await listPublishedPosts()).find((p) => p.slug === slug);
+  if (!mongoConfigured() || !/^[a-z0-9-]{1,100}$/.test(slug)) return undefined;
+  const doc = await (await posts()).findOne({ slug, status: "published" });
+  if (!doc) return undefined;
+  const p = toPost(doc);
+  return p.datePublished && p.datePublished <= new Date().toISOString() ? p : undefined;
 }
 
 /* ---------- writes ---------- */
 
-export class ValidationError extends Error {}
+export async function savePost(input: Partial<BlogPost>, id?: string): Promise<BlogPost> {
+  requireDb();
+  const col = await posts();
+  const prevDoc = id ? await col.findOne({ _id: String(id) }) : null;
+  if (id && !prevDoc) throw new ValidationError("Post not found.");
+  const post = normalize(input, prevDoc ? toPost(prevDoc) : undefined);
+  if (!post.title) throw new ValidationError("Title is required.");
+  if (!post.slug) throw new ValidationError("Slug is required.");
+  if (post.status === "published" && !post.content.trim()) throw new ValidationError("Write some content before publishing.");
+  const clash = await col.findOne({ slug: post.slug, _id: { $ne: post.id } }, { projection: { _id: 1 } });
+  if (clash) throw new ValidationError(`Another post already uses the slug “${post.slug}”.`);
+  try {
+    await col.replaceOne({ _id: post.id }, toDoc(post), { upsert: true });
+  } catch (e) {
+    if ((e as { code?: number }).code === 11000) throw new ValidationError(`Another post already uses the slug “${post.slug}”.`);
+    throw e;
+  }
+  return post;
+}
 
-export function savePost(input: Partial<BlogPost>, id?: string): Promise<BlogPost> {
-  return locked(async () => {
-    const posts = [...(await readAll())];
-    const idx = id ? posts.findIndex((p) => p.id === id) : -1;
-    if (id && idx < 0) throw new ValidationError("Post not found.");
-    const prev = idx >= 0 ? posts[idx] : undefined;
-    const post = normalize(input, prev);
-    if (!post.title) throw new ValidationError("Title is required.");
-    if (!post.slug) throw new ValidationError("Slug is required.");
-    if (posts.some((p) => p.slug === post.slug && p.id !== post.id)) throw new ValidationError(`Another post already uses the slug “${post.slug}”.`);
-    if (post.status === "published" && !post.content.trim()) throw new ValidationError("Write some content before publishing.");
-    if (idx >= 0) posts[idx] = post;
-    else posts.push(post);
-    await writeAll(posts);
-    return post;
+export async function deletePost(id: string): Promise<BlogPost | undefined> {
+  requireDb();
+  const doc = await (await posts()).findOneAndDelete({ _id: String(id) });
+  return doc ? toPost(doc) : undefined;
+}
+
+/* ---------- images (GridFS) ---------- */
+
+async function bucket() {
+  return new GridFSBucket(await getDb(), { bucketName: "blog_images" });
+}
+
+export async function saveImage(filename: string, data: Buffer, meta: { mime: string; width?: number; height?: number }) {
+  requireDb();
+  const b = await bucket();
+  await new Promise<void>((resolve, reject) => {
+    const up = b.openUploadStream(filename, { metadata: { contentType: meta.mime, width: meta.width, height: meta.height } });
+    up.once("finish", () => resolve());
+    up.once("error", reject);
+    up.end(data);
   });
 }
 
-export function deletePost(id: string): Promise<BlogPost | undefined> {
-  return locked(async () => {
-    const posts = [...(await readAll())];
-    const idx = posts.findIndex((p) => p.id === id);
-    if (idx < 0) return undefined;
-    const [gone] = posts.splice(idx, 1);
-    await writeAll(posts);
-    return gone;
+export async function readImage(filename: string): Promise<{ data: Buffer; mime: string } | null> {
+  if (!mongoConfigured()) return null;
+  const b = await bucket();
+  const [file] = await b.find({ filename }).sort({ uploadDate: -1 }).limit(1).toArray();
+  if (!file) return null;
+  const chunks: Buffer[] = [];
+  await new Promise<void>((resolve, reject) => {
+    b.openDownloadStream(file._id)
+      .on("data", (c: Buffer) => chunks.push(c))
+      .once("end", () => resolve())
+      .once("error", reject);
   });
+  return { data: Buffer.concat(chunks), mime: String((file.metadata as { contentType?: string } | undefined)?.contentType || "application/octet-stream") };
 }
 
 /* ---------- input normalisation (never trust the client) ---------- */
