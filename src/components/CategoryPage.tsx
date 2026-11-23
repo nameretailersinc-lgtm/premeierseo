@@ -7,7 +7,6 @@ import { Icon } from "./Icon";
 import { JsonLd } from "./JsonLd";
 import { Markdown } from "./Markdown";
 import { CATEGORY_BY_ID } from "@/content/categories";
-import { GUIDES } from "@/content/guides";
 import { alsoInCategory, toolsInCategory } from "@/content/tools";
 import { GROUP_ART, categoryArt, categoryHeroArt } from "@/lib/illustrations";
 import { categoryGraph, type Crumb } from "@/lib/schema";
@@ -26,7 +25,6 @@ export function CategoryPage({ cat }: { cat: CategoryDef }) {
   const tools = toolsInCategory(cat.id, cat.groups.map((g) => g.id));
   const also = alsoInCategory(cat.id);
   const crumbs: Crumb[] = [{ name: "Home", path: "/" }, { name: cat.label }];
-  const guides = (cat.guides ?? []).map((g) => GUIDES.find((x) => x.path === g)).filter(Boolean);
   const groups = cat.groups.map((g) => ({ ...g, tools: tools.filter((t) => t.subgroup === g.id) })).filter((g) => g.tools.length);
   const all = [...tools, ...also];
   const local = all.filter((t) => t.processing === "browser").length;
@@ -179,26 +177,6 @@ export function CategoryPage({ cat }: { cat: CategoryDef }) {
               })}
             </ul>
           </div>
-          {guides.length > 0 && (
-            <div className="card p-5">
-              <div className="mb-3 flex items-center gap-3">
-                <span className="icon-tile hue-orange size-10 rounded-xl">
-                  <Icon name="book-open" size={18} />
-                </span>
-                <h2 className="font-bold text-ink">Guides</h2>
-              </div>
-              <ul className="grid gap-1">
-                {guides.map((g) => (
-                  <li key={g!.path}>
-                    <Link href={g!.path} className="flex items-start gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-accent hover:bg-accent-subtle">
-                      <Icon name="file-text" size={16} className="mt-0.5 shrink-0" />
-                      {g!.h1}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </aside>
       </div>
 

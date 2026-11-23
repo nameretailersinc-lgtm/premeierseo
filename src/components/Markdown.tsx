@@ -1,9 +1,23 @@
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
-import { GUIDES } from "@/content/guides";
+import { headingId } from "@/lib/blog-types";
 
-/** Guides that are published; links to planned (unpublished) guides render as plain text instead of 404 links. */
-const LIVE_GUIDES = new Set(GUIDES.map((g) => g.path));
+/** Only these link schemes are rendered as links; anything else (javascript:, data:) becomes plain text. */
+function safeHref(href: string): string | null {
+  const h = href.trim();
+  if (h.startsWith("/") || h.startsWith("#")) return h;
+  if (/^(https?:|mailto:)/i.test(h)) return h;
+  return null;
+}
+
+function safeSrc(src: string): string | null {
+  const s = src.trim();
+  if (s.startsWith("/") && !s.startsWith("//")) return s;
+  return /^https?:\/\//i.test(s) ? s : null;
+}
+
+/** ![alt](src "caption") → parts. */
+const IMG_RE = /^!\[([^\]]*)\]\(\s*([^)\s]+)(?:\s+"([^"]*)")?\s*\)$/;
 
 /*
  * Minimal server-side markdown for registry content (zero client JS):
@@ -12,9 +26,13 @@ const LIVE_GUIDES = new Set(GUIDES.map((g) => g.path));
  * external links get rel="noopener" and open in the same tab.
  */
 
-function inline(text: string, keyPrefix: string): ReactNode[] {
+/**
+ * Static registry content can't know which admin posts exist, so links to /blog/<slug>/ from it render as
+ * plain text (never a 404 link). Post bodies pass blogLinks to allow them.
+ */
+function inline(text: string, keyPrefix: string, blogLinks = false): ReactNode[] {
   const out: ReactNode[] = [];
-  const re = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\)|\*[^*\s][^*]*\*)/g;
+  const re = /(\*\*[^*]+\*\*|`[^`]+`|!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\)|\*[^*\s][^*]*\*)/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let i = 0;
@@ -24,10 +42,16 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
     const key = `${keyPrefix}-${i++}`;
     if (tok.startsWith("**")) out.push(<strong key={key}>{tok.slice(2, -2)}</strong>);
     else if (tok.startsWith("`")) out.push(<code key={key}>{tok.slice(1, -1)}</code>);
-    else if (tok.startsWith("[")) {
+    else if (tok.startsWith("![")) {
+      const im = IMG_RE.exec(tok);
+      const src = im && safeSrc(im[2]);
+      // eslint-disable-next-line @next/next/no-img-element
+      if (im && src) out.push(<img key={key} src={src} alt={im[1]} title={im[3] || undefined} loading="lazy" decoding="async" className="inline-block max-h-[1.5em] align-middle" />);
+    } else if (tok.startsWith("[")) {
       const lm = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(tok)!;
-      const [, label, href] = lm;
-      if (href.startsWith("/blog/") && href !== "/blog/" && !LIVE_GUIDES.has(href.split("#")[0])) {
+      const [, label] = lm;
+      const href = safeHref(lm[2]);
+      if (!href || (!blogLinks && href.startsWith("/blog/") && href !== "/blog/")) {
         out.push(label);
       } else if (href.startsWith("/")) {
         out.push(
@@ -49,7 +73,8 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
   return out;
 }
 
-export function Markdown({ text, className }: { text: string; className?: string }) {
+export function Markdown({ text, className, blogLinks = false }: { text: string; className?: string; blogLinks?: boolean }) {
+  const inl = (t: string, k: string) => inline(t, k, blogLinks);
   const lines = text.replace(/\r\n/g, "\n").split("\n");
   const blocks: ReactNode[] = [];
   let i = 0;
@@ -73,13 +98,44 @@ export function Markdown({ text, className }: { text: string; className?: string
       );
       continue;
     }
+    const hm = /^(#{2,4})\s+(.+?)\s*#*$/.exec(line);
+    if (hm) {
+      const level = hm[1].length;
+      const id = headingId(hm[2]);
+      const content = inl(hm[2], key);
+      blocks.push(
+        level === 2 ? (
+          <h2 key={key} id={id}>{content}</h2>
+        ) : level === 3 ? (
+          <h3 key={key} id={id}>{content}</h3>
+        ) : (
+          <h4 key={key} id={id}>{content}</h4>
+        ),
+      );
+      i++;
+      continue;
+    }
+    const im = IMG_RE.exec(line.trim());
+    if (im) {
+      const src = safeSrc(im[2]);
+      if (src)
+        blocks.push(
+          <figure key={key} className="my-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt={im[1]} loading="lazy" decoding="async" className="h-auto w-full rounded-xl border border-line" />
+            {im[3] && <figcaption className="mt-2 text-center text-sm text-ink-3">{im[3]}</figcaption>}
+          </figure>,
+        );
+      i++;
+      continue;
+    }
     if (/^\s*[-*] /.test(line)) {
       const items: string[] = [];
       while (i < lines.length && /^\s*[-*] /.test(lines[i])) items.push(lines[i++].replace(/^\s*[-*] /, ""));
       blocks.push(
         <ul key={key}>
           {items.map((it, j) => (
-            <li key={j}>{inline(it, `${key}-${j}`)}</li>
+            <li key={j}>{inl(it, `${key}-${j}`)}</li>
           ))}
         </ul>,
       );
@@ -91,7 +147,7 @@ export function Markdown({ text, className }: { text: string; className?: string
       blocks.push(
         <ol key={key}>
           {items.map((it, j) => (
-            <li key={j}>{inline(it, `${key}-${j}`)}</li>
+            <li key={j}>{inl(it, `${key}-${j}`)}</li>
           ))}
         </ol>,
       );
@@ -115,7 +171,7 @@ export function Markdown({ text, className }: { text: string; className?: string
             <tr>
               {head.map((c, j) => (
                 <th key={j} scope="col">
-                  {inline(c, `${key}-h${j}`)}
+                  {inl(c, `${key}-h${j}`)}
                 </th>
               ))}
             </tr>
@@ -124,7 +180,7 @@ export function Markdown({ text, className }: { text: string; className?: string
             {body.map((r, ri) => (
               <tr key={ri}>
                 {r.map((c, j) => (
-                  <td key={j}>{inline(c, `${key}-${ri}-${j}`)}</td>
+                  <td key={j}>{inl(c, `${key}-${ri}-${j}`)}</td>
                 ))}
               </tr>
             ))}
@@ -136,7 +192,7 @@ export function Markdown({ text, className }: { text: string; className?: string
     if (line.startsWith("> ")) {
       const q: string[] = [];
       while (i < lines.length && lines[i].startsWith("> ")) q.push(lines[i++].slice(2));
-      blocks.push(<blockquote key={key}>{inline(q.join(" "), key)}</blockquote>);
+      blocks.push(<blockquote key={key}>{inl(q.join(" "), key)}</blockquote>);
       continue;
     }
     const para: string[] = [];
@@ -145,10 +201,13 @@ export function Markdown({ text, className }: { text: string; className?: string
       lines[i].trim() &&
       !/^\s*([-*]|\d+\.) /.test(lines[i]) &&
       !lines[i].trim().startsWith("|") &&
-      !lines[i].startsWith("```")
+      !lines[i].startsWith("```") &&
+      !/^#{2,4}\s/.test(lines[i]) &&
+      !IMG_RE.test(lines[i].trim()) &&
+      !lines[i].startsWith("> ")
     )
       para.push(lines[i++]);
-    blocks.push(<p key={key}>{inline(para.join(" "), key)}</p>);
+    blocks.push(<p key={key}>{inl(para.join(" "), key)}</p>);
   }
   if (className) return <div className={className}>{blocks}</div>;
   return <Fragment>{blocks}</Fragment>;

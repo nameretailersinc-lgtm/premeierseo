@@ -7,7 +7,8 @@ import { RecentTools } from "@/components/RecentTools";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HomeHero } from "./HomeHero";
 import { CATEGORIES, CATEGORY_BY_ID } from "@/content/categories";
-import { GUIDES } from "@/content/guides";
+import { PostCard } from "@/components/blog/PostCard";
+import type { BlogPost } from "@/lib/blog-types";
 import { TOOLS, popularTools } from "@/content/tools";
 import type { CategoryId, Faq, IconName } from "@/lib/types";
 
@@ -25,15 +26,6 @@ const STEPS: { t: string; d: string; icon: IconName; hue: string }[] = [
 ];
 
 /** Colour and icon per guide topic, so the guide cards are easy to tell apart. */
-const GUIDE_STYLE: Record<string, { hue: string; icon: IconName }> = {
-  "Image optimization": { hue: "hue-purple", icon: "image" },
-  "PDF workflows": { hue: "hue-red", icon: "file-text" },
-  Writing: { hue: "hue-orange", icon: "pen" },
-  "Content optimization": { hue: "hue-teal", icon: "scan-text" },
-  "On-page SEO": { hue: "hue-green", icon: "trending-up" },
-  "Technical SEO": { hue: "hue-blue", icon: "code" },
-};
-
 const TRUST: { icon: IconName; hue: string; title: string; text: string }[] = [
   {
     icon: "shield-check",
@@ -55,10 +47,10 @@ const TRUST: { icon: IconName; hue: string; title: string; text: string }[] = [
   },
 ];
 
-export function HomeView({ start, toolkits, faq }: { start: string[]; toolkits: Toolkit[]; faq: Faq[] }) {
+export function HomeView({ start, toolkits, faq, posts = [] }: { start: string[]; toolkits: Toolkit[]; faq: Faq[]; posts?: BlogPost[] }) {
   const counts = categoryCounts();
   const startTools = popularTools(start);
-  const guides = GUIDES.slice(0, 4);
+  const latest = posts.slice(0, 3);
   const local = TOOLS.filter((t) => t.processing === "browser").length;
 
   return (
@@ -238,49 +230,23 @@ export function HomeView({ start, toolkits, faq }: { start: string[]; toolkits: 
           </p>
         </section>
 
-        {guides.length > 0 && (
-          <section aria-labelledby="guides" className="mt-20">
+        {latest.length > 0 && (
+          <section aria-labelledby="latest-posts" className="mt-20">
             <SectionHeader
-              id="guides"
+              id="latest-posts"
               eyebrow="Learn"
-              title="Guides"
-              subtitle="Step-by-step explanations of the jobs our tools help with."
+              title="From the blog"
+              subtitle="Practical articles on SEO, content, images and PDFs."
               action={
                 <Link href="/blog/" className="link-more">
-                  All guides <Icon name="arrow-right" size={16} />
+                  All articles <Icon name="arrow-right" size={16} />
                 </Link>
               }
             />
-            <ul className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-              {guides.map((g) => {
-                const st = GUIDE_STYLE[g.cluster] ?? { hue: "hue-blue", icon: "book-open" as IconName };
-                return (
-                  <li key={g.slug} className={`${st.hue} card-link group flex flex-col p-5 sm:p-6`}>
-                    <span className="flex items-center gap-3">
-                      <span className="icon-tile size-10 rounded-xl">
-                        <Icon name={st.icon} size={20} />
-                      </span>
-                      <span className="eyebrow text-hue">{g.cluster}</span>
-                    </span>
-                    <h3 className="mt-4 line-clamp-2 text-[1.0625rem] leading-snug font-bold text-ink">
-                      <Link href={g.path}>{g.h1}</Link>
-                    </h3>
-                    <p className="mt-2 mb-5 line-clamp-2 text-sm leading-6 text-ink-3">{g.metaDescription}</p>
-                    <span className="mt-auto flex items-center justify-between border-t border-line pt-4 text-[0.8125rem] font-medium text-ink-3">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Icon name="clock" size={14} />
-                        {g.readingMinutes ? `${g.readingMinutes} min read` : "Guide"}
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 font-semibold text-hue">
-                        Read guide
-                        <span className="arrow-dot size-6">
-                          <Icon name="arrow-right" size={13} strokeWidth={2.25} />
-                        </span>
-                      </span>
-                    </span>
-                  </li>
-                );
-              })}
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {latest.map((p) => (
+                <PostCard key={p.id} post={p} />
+              ))}
             </ul>
           </section>
         )}

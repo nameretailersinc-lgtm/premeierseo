@@ -198,19 +198,3 @@ export type IconName =
   | "layout-grid"
   | "message";
 
-export interface GuideDef {
-  slug: string;
-  path: string;
-  title: string;
-  h1: string;
-  metaDescription: string;
-  summary: string;
-  datePublished: string;
-  dateModified: string;
-  cluster: string;
-  /** Tools used in this guide (ids). */
-  tools: string[];
-  body: ContentSection[];
-  sources?: { label: string; url: string }[];
-  readingMinutes?: number;
-}

@@ -22,7 +22,7 @@ const COMPANY = [
   ["/contact/", "Contact"],
   ["/tool-complain/", "Report a problem"],
   ["/faq/", "FAQ"],
-  ["/blog/", "Guides"],
+  ["/blog/", "Blog"],
   ["/privacy-policy/", "Privacy policy"],
   ["/terms-and-conditions/", "Terms and conditions"],
   ["/write-for-us/", "Write for us"],

@@ -5,7 +5,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { CATEGORIES } from "../src/content/categories";
-import { GUIDES } from "../src/content/guides";
 import { TOOLS } from "../src/content/tools";
 import migration from "../src/seo/migration.json";
 
@@ -38,7 +37,7 @@ const BANNED = [
 
 const redirects = migration.redirects as Record<string, string>;
 const gone = new Set(migration.gone as string[]);
-const livePaths = new Set<string>(["/", "/tools/", "/blog/", ...CATEGORIES.map((c) => c.path), ...TOOLS.map((t) => t.path), ...GUIDES.map((g) => g.path)]);
+const livePaths = new Set<string>(["/", "/tools/", "/blog/", ...CATEGORIES.map((c) => c.path), ...TOOLS.map((t) => t.path)]);
 ["/about-us/", "/contact/", "/faq/", "/privacy-policy/", "/terms-and-conditions/", "/write-for-us/", "/tool-complain/"].forEach((p) => livePaths.add(p));
 
 const seen = { id: new Map<string, string>(), path: new Map<string, string>(), title: new Map<string, string>(), desc: new Map<string, string>(), h1: new Map<string, string>() };
@@ -118,13 +117,7 @@ for (const c of CATEGORIES) {
   checkText(`category ${c.id}`, [c.intro, ...c.sections.map((s) => s.body), ...c.faq.map((f) => f.a)].join("\n"));
 }
 
-for (const g of GUIDES) {
-  const w = `guide ${g.slug}`;
-  if (g.title.length > 65) err(`${w}: title too long`);
-  if (g.metaDescription.length < 110 || g.metaDescription.length > 160) err(`${w}: description length ${g.metaDescription.length}`);
-  for (const id of g.tools) if (!ids.has(id)) err(`${w}: tool ${id} does not exist`);
-  checkText(w, g.body.map((b) => b.heading + "\n" + b.body).join("\n"));
-}
+// Blog posts are written in /admin/ and checked live by the editor's SEO panel.
 
 // Placeholder widgets that no tool uses are fine; placeholders used by tools are errors (above).
 const expected = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "docs", "keyword-map.json"), "utf8")) as {
@@ -134,7 +127,7 @@ const expectedTools = expected.pages.filter((p) => p.pageType === "tool" && ["ke
 const missing = expectedTools.filter((u) => !TOOLS.some((t) => t.path === u));
 if (missing.length) (process.argv.includes("--strict") ? err : warn)(`${missing.length} planned tools not in the registry yet: ${missing.slice(0, 40).join(" ")}${missing.length > 40 ? " …" : ""}`);
 
-console.log(`Tools: ${TOOLS.length} · Categories: ${CATEGORIES.length} · Guides: ${GUIDES.length}`);
+console.log(`Tools: ${TOOLS.length} · Categories: ${CATEGORIES.length}`);
 if (warnings.length) console.log(`\nWarnings (${warnings.length}):\n- ` + warnings.join("\n- "));
 if (errors.length) {
   console.log(`\nErrors (${errors.length}):\n- ` + errors.join("\n- "));

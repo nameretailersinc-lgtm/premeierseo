@@ -13,3 +13,12 @@ services:
       IPINFO_TOKEN: ${IPINFO_TOKEN:-}
       PAGESPEED_API_KEY: ${PAGESPEED_API_KEY:-}
       REPORT_WEBHOOK_URL: ${REPORT_WEBHOOK_URL:-}
+      # Blog admin at /admin/: set both in the server's .env (admin stays disabled while ADMIN_PASSWORD is empty).
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
+    volumes:
+      # Blog posts + uploaded images. Named volume: survives `docker compose build/up` on every deploy.
+      - blog-data:/app/data
+
+volumes:
+  blog-data:

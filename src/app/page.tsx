@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/components/JsonLd";
 import { HomeView, type Toolkit } from "@/components/home/HomeView";
 import { homeGraph } from "@/lib/schema";
+import { listPublishedPosts } from "@/lib/server/blog-store";
 import { buildMetadata } from "@/lib/seo";
 
 const TITLE = "Free SEO, Text, Image & PDF Tools – Premier SEO Services";
@@ -9,6 +10,9 @@ const DESCRIPTION =
   "Browser-based tools for everyday jobs: count words, compress images to an exact KB size, merge PDFs, check redirects and create meta tags. No sign-up.";
 
 export const metadata: Metadata = buildMetadata({ path: "/", title: TITLE, description: DESCRIPTION });
+
+// Re-rendered at most once a minute (and immediately when a post is saved in /admin/) to show the latest posts.
+export const revalidate = 60;
 
 /** Editorial picks (not usage data), matching the "Most-needed tools" row of the design. */
 const START = [
@@ -69,11 +73,12 @@ const FAQ = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const posts = (await listPublishedPosts()).filter((p) => !p.seo.noindex).slice(0, 3);
   return (
     <>
       <JsonLd graph={homeGraph(TITLE, DESCRIPTION)} />
-      <HomeView start={START} toolkits={TOOLKITS} faq={FAQ} />
+      <HomeView start={START} toolkits={TOOLKITS} faq={FAQ} posts={posts} />
     </>
   );
 }

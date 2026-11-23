@@ -8,7 +8,7 @@ const results = [];
 try {
   for (const colorScheme of ["light", "dark"]) {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme });
-    for (const path of ["/blog/google-indexing-troubleshooting/", "/contact/", "/meta-tags-analyzer/"]) {
+    for (const path of ["/blog/", "/contact/", "/meta-tags-analyzer/"]) {
       const page = await context.newPage();
       await page.goto(base + path, { waitUntil: "networkidle", timeout: 30000 });
       const report = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();

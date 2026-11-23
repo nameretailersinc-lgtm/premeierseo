@@ -120,7 +120,8 @@ jobs:
             / \
             /robots.txt \
             /sitemap.xml \
-            /blog/google-indexing-troubleshooting/ \
+            /blog/ \
+            /admin/login/ \
             /google36515a0fbd6dce32.html
           do
             curl --fail --silent --show-error \

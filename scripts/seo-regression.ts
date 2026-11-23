@@ -5,7 +5,6 @@ import { isBlockedIp, normalizeUserUrl } from "../src/lib/server/safe-fetch";
 import { POST } from "../src/app/api/report/route";
 import sitemap from "../src/app/sitemap";
 import { TOOLS } from "../src/content/tools";
-import { GUIDES } from "../src/content/guides";
 import { absUrl } from "../src/lib/site";
 
 async function main() {
@@ -23,11 +22,10 @@ async function main() {
   for (const body of [{ kind: "contact", message: 12 }, { kind: "invalid", message: "test" }, { kind: "contact", message: "" }]) {
     assert.equal((await POST(new Request("https://example.com/api/report", { method: "POST", body: JSON.stringify(body) }))).status, 400);
   }
-  const entries = sitemap();
+  const entries = await sitemap();
   const urls = new Set(entries.map((entry) => entry.url));
   assert.equal(urls.size, entries.length);
   for (const tool of TOOLS) assert.equal(urls.has(absUrl(tool.path)), tool.indexable, tool.path);
-  for (const guide of GUIDES) assert.equal(urls.has(absUrl(guide.path)), true, guide.path);
   console.log(`SEO regression checks passed; ${entries.length} unique sitemap URLs.`);
 }
 main().catch((error) => { console.error(error); process.exitCode = 1; });

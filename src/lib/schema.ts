@@ -1,5 +1,6 @@
 import { SITE, absUrl } from "./site";
-import type { CategoryDef, GuideDef, ToolDef } from "./types";
+import type { CategoryDef, ToolDef } from "./types";
+import { effectiveDescription, effectiveMetaTitle, postPath, wordCount, type BlogPost } from "./blog-types";
 
 /** JSON-LD graph builders. Only describe what is visible and true on the page. */
 
@@ -158,28 +159,59 @@ export function collectionGraph(path: string, title: string, description: string
   ];
 }
 
-export function guideGraph(g: GuideDef, crumbs: Crumb[]): Node[] {
-  const url = absUrl(g.path);
-  return [
+/** Absolute image URL for a stored image src (site path or absolute). */
+export function absImage(src: string): string {
+  return /^https?:\/\//.test(src) ? src : `${SITE.origin}${src.startsWith("/") ? src : `/${src}`}`;
+}
+
+/** BlogPosting (or the chosen Article subtype) + WebPage + BreadcrumbList (+ FAQPage when the post has FAQs). */
+export function blogPostGraph(p: BlogPost, crumbs: Crumb[]): Node[] {
+  const path = postPath(p.slug);
+  const url = absUrl(path);
+  const title = effectiveMetaTitle(p);
+  const description = effectiveDescription(p);
+  const img = p.featuredImage ?? p.seo.ogImage;
+  const author: Node = p.authorName
+    ? { "@type": "Person", name: p.authorName, ...(p.authorUrl ? { url: absUrl(p.authorUrl) } : {}) }
+    : { "@id": ORG_ID };
+  const keywords = [p.seo.focusKeyword, ...p.seo.secondaryKeywords, ...p.tags].filter(Boolean);
+  const graph: Node[] = [
     {
-      "@type": "BlogPosting",
+      "@type": p.seo.schemaType || "BlogPosting",
       "@id": `${url}#article`,
       mainEntityOfPage: { "@id": `${url}#webpage` },
-      headline: g.h1,
-      description: g.metaDescription,
-      image: `${url}opengraph-image`,
-      datePublished: g.datePublished,
-      dateModified: g.dateModified,
-      author: { "@id": ORG_ID },
+      headline: p.title.slice(0, 110),
+      description,
+      image: img
+        ? { "@type": "ImageObject", url: absImage(img.src), ...(img.width ? { width: img.width, height: img.height } : {}), ...(img.caption ? { caption: img.caption } : {}) }
+        : `${url}og-image.png`,
+      datePublished: p.datePublished,
+      dateModified: p.dateModified,
+      author,
       publisher: { "@id": ORG_ID },
       isPartOf: { "@id": WEBSITE_ID },
       inLanguage: SITE.language,
+      articleSection: p.category,
+      wordCount: wordCount(p.content),
+      ...(keywords.length ? { keywords: [...new Set(keywords)].join(", ") } : {}),
     },
-    webPageNode(g.path, g.title, g.metaDescription, { breadcrumb: { "@id": `${url}#breadcrumb` } }),
-    breadcrumbNode(g.path, crumbs),
+    webPageNode(path, title, description, {
+      breadcrumb: { "@id": `${url}#breadcrumb` },
+      ...(img ? { primaryImageOfPage: { "@type": "ImageObject", url: absImage(img.src) } } : {}),
+    }),
+    breadcrumbNode(path, crumbs),
     organizationNode(),
     websiteNode(),
   ];
+  if (p.faqs.length) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${url}#faq`,
+      isPartOf: { "@id": `${url}#webpage` },
+      mainEntity: p.faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    });
+  }
+  return graph;
 }
 
 export function simplePageGraph(

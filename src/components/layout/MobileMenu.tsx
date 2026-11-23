@@ -19,7 +19,7 @@ interface Cat {
 
 const LINKS: [string, string, IconName][] = [
   ["/tools/", "All tools A–Z", "layout-grid"],
-  ["/blog/", "Guides", "book-open"],
+  ["/blog/", "Blog", "book-open"],
   ["/faq/", "FAQ", "help-circle"],
   ["/about-us/", "About", "info"],
   ["/contact/", "Contact", "mail"],

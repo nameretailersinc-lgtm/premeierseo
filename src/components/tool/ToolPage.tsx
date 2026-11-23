@@ -7,7 +7,6 @@ import { PrefillLink } from "@/components/PrefillLink";
 import { JsonLd } from "@/components/JsonLd";
 import { InlineMd, Markdown } from "@/components/Markdown";
 import { CATEGORY_BY_ID } from "@/content/categories";
-import { GUIDES } from "@/content/guides";
 import { relatedTools } from "@/content/tools";
 import { toolGraph, type Crumb } from "@/lib/schema";
 import type { Archetype, ToolDef } from "@/lib/types";
@@ -50,7 +49,6 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
   const crumbs: Crumb[] = [{ name: "Home", path: "/" }, { name: cat.label, path: cat.path }, { name: tool.name }];
   const related = relatedTools(tool, 6);
   const privacy = privacyStatement(tool);
-  const guides = GUIDES.filter((g) => (tool.guides ?? []).includes(g.path) || g.tools.includes(tool.id)).slice(0, 5);
   const contextual = (tool.links ?? []).filter((l) => !related.some((r) => r.path === l.href) && !l.href.startsWith("/blog/"));
   const jumps = jumpLinks(tool);
 
@@ -243,29 +241,6 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
             </article>
 
             <FaqList items={tool.faq} heading={questionsHeading(tool.name)} />
-
-            {guides.length > 0 && (
-              <section aria-labelledby="learn-more" className="mt-12">
-                <h2 id="learn-more" className="mb-4 text-xl font-bold sm:text-2xl">
-                  Learn more
-                </h2>
-                <ul className="grid gap-3 sm:grid-cols-2">
-                  {guides.map((g) => (
-                    <li key={g!.path} className="card-link group hue-orange flex items-center gap-3.5 p-4 pr-11">
-                      <span className="icon-tile size-10 rounded-xl">
-                        <Icon name="book-open" size={18} />
-                      </span>
-                      <Link href={g!.path} className="text-[0.9375rem] leading-snug font-semibold text-ink">
-                        {g!.h1}
-                      </Link>
-                      <span className="arrow-dot absolute right-3.5">
-                        <Icon name="arrow-right" size={14} strokeWidth={2.25} />
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
 
             <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-xl border border-line bg-surface-2 px-4 py-3.5 text-sm text-ink-3">
               <p className="flex flex-wrap gap-x-2.5 gap-y-1">

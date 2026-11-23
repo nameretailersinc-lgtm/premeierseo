@@ -24,7 +24,7 @@ export function Header() {
       const c = CATEGORIES.find((x) => x.id === id)!;
       return { href: c.path, label: c.navLabel };
     }),
-    { href: "/blog/", label: "Guides" },
+    { href: "/blog/", label: "Blog" },
   ];
   return (
     <header className="z-40 border-b border-line border-t-2 border-t-accent bg-surface/85 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-surface/75 [@media(min-height:35rem)]:sticky [@media(min-height:35rem)]:top-0">
