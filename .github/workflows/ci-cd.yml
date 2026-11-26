@@ -130,8 +130,8 @@ jobs:
             /google36515a0fbd6dce32.html
           do
             curl --fail --silent --show-error \
-              --max-time 15 \
-              "http://127.0.0.1:3200$route" > /dev/null
+              --max-time 15 --output /dev/null \
+              "http://127.0.0.1:3200$route"
           done
 
           # Replaced guides must keep answering as intended (src/seo/migration.json).
