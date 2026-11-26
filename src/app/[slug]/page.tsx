@@ -7,6 +7,8 @@ import { TOOLS, getToolByPath } from "@/content/tools";
 import { buildMetadata } from "@/lib/seo";
 
 export const dynamicParams = false;
+/* Tool pages link to published guides only; saving a post in /admin/ also revalidates them at once. */
+export const revalidate = 3600;
 
 /** Root-level slugs: category hubs (except /text-tools/, which has its own route) and tools. */
 export function generateStaticParams() {

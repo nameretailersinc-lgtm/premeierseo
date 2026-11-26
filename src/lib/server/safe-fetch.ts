@@ -4,6 +4,7 @@ import http from "node:http";
 import https from "node:https";
 import net from "node:net";
 import zlib from "node:zlib";
+import { promisify } from "node:util";
 
 /*
  * SSRF-safe HTTP client for the URL-checking tools.
@@ -161,6 +162,25 @@ interface Options {
   accept?: string;
 }
 
+/** Cap decoded bytes too: a small compressed response must not exhaust server memory. */
+export async function decodeResponseBody(raw: Buffer, encoding: string, maxBytes: number): Promise<Buffer> {
+  if (raw.length > maxBytes) throw new FetchError("TOO_LARGE", "The response exceeds the size limit.");
+  if (!raw.length || !encoding) return raw;
+  try {
+    const options = { maxOutputLength: maxBytes };
+    if (encoding === "br") return await promisify(zlib.brotliDecompress)(raw, options);
+    if (encoding === "gzip") return await promisify(zlib.gunzip)(raw, options);
+    if (encoding === "deflate") return await promisify(zlib.inflate)(raw, options);
+    throw new FetchError("CONNECTION_FAILED", "The site used an unsupported response encoding.");
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === "ERR_BUFFER_TOO_LARGE") {
+      throw new FetchError("TOO_LARGE", "The decompressed response exceeds the size limit.");
+    }
+    if (e instanceof FetchError) throw e;
+    throw new FetchError("CONNECTION_FAILED", "The site returned an invalid compressed response.");
+  }
+}
+
 function one(u: URL, o: Required<Options>): Promise<{ hop: Hop; body: Buffer; transfer: number; truncated: boolean; ttfb: number; tls?: SafeResponse["tls"] }> {
   return new Promise((resolve, reject) => {
     const start = performance.now();
@@ -212,19 +232,23 @@ function one(u: URL, o: Required<Options>): Promise<{ hop: Hop; body: Buffer; tr
             chunks.push(c);
           });
         }
-        const done = () => {
+        let finished = false;
+        const done = async () => {
+          if (finished) return;
+          finished = true;
           const raw = Buffer.concat(chunks);
           const enc = (headers["content-encoding"] || "").toLowerCase();
-          let body = raw;
+          let body: Buffer = raw;
           try {
             if (!truncated && raw.length) {
-              if (enc.includes("br")) body = zlib.brotliDecompressSync(raw);
-              else if (enc.includes("gzip")) body = zlib.gunzipSync(raw);
-              else if (enc.includes("deflate")) body = zlib.inflateSync(raw);
+              body = await decodeResponseBody(raw, enc, o.maxBytes);
             }
-          } catch {
-            body = raw;
+          } catch (e) {
+            clearTimeout(deadline);
+            reject(e);
+            return;
           }
+          clearTimeout(deadline);
           resolve({
             hop: {
               url: u.toString(),
@@ -245,11 +269,14 @@ function one(u: URL, o: Required<Options>): Promise<{ hop: Hop; body: Buffer; tr
         res.on("close", () => {
           if (truncated) done();
         });
-        res.on("error", (e) => reject(e));
+        res.on("error", (e) => { clearTimeout(deadline); reject(e); });
       },
     );
+    const deadline = setTimeout(() => req.destroy(new FetchError("TIMEOUT", "The response exceeded the request time limit.")), o.timeoutMs);
+    deadline.unref();
     req.on("timeout", () => req.destroy(new FetchError("TIMEOUT", `The site didn't respond within ${Math.round(o.timeoutMs / 1000)} seconds.`)));
     req.on("error", (e: NodeJS.ErrnoException) => {
+      clearTimeout(deadline);
       if (e instanceof FetchError) return reject(e);
       if (e.code === "EBLOCKED") return reject(new FetchError("BLOCKED_ADDRESS", "That address points to a private or reserved network and can't be checked."));
       if (e.code === "ENOTFOUND" || e.code === "EAI_AGAIN") return reject(new FetchError("DNS_FAILED", "The domain name could not be found (DNS lookup failed)."));
@@ -274,8 +301,12 @@ export async function safeFetch(input: string | URL, opts: Options = {}): Promis
   const requestedUrl = url.toString();
   const hops: Hop[] = [];
   const t0 = performance.now();
+  // One request may use timeoutMs; a whole redirect chain shares twice that, so many slow hops can't add up.
+  const until = t0 + o.timeoutMs * 2;
   for (let i = 0; i <= o.maxRedirects; i++) {
-    const r = await one(url, o);
+    const left = Math.floor(until - performance.now());
+    if (left <= 0) throw new FetchError("TIMEOUT", "The redirect chain exceeded the overall time limit.");
+    const r = await one(url, { ...o, timeoutMs: Math.min(o.timeoutMs, left) });
     hops.push(r.hop);
     const isRedirect = [301, 302, 303, 307, 308].includes(r.hop.status) && r.hop.location;
     if (isRedirect && o.followRedirects) {

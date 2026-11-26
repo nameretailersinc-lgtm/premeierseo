@@ -248,6 +248,7 @@ export const CALCULATOR_TOOLS: ToolDef[] = [
     ],
     related: ["discount-calculator", "gst-calculator", "adsense-calculator", "loan-emi-calculator", "bmi-calculator"],
     links: [
+      { href: "/blog/how-to-calculate-percentage-increase/", anchor: "percentage increase formula" },
       { href: "/discount-calculator/", anchor: "discount calculator" },
       { href: "/gst-calculator/", anchor: "GST calculator" },
       { href: "/adsense-calculator/", anchor: "AdSense calculator" },
@@ -664,6 +665,7 @@ export const CALCULATOR_TOOLS: ToolDef[] = [
     ],
     related: ["chronological-age-calculator", "hours-calculator", "bmi-calculator", "loan-emi-calculator"],
     links: [
+      { href: "/blog/how-to-calculate-age-from-date-of-birth/", anchor: "how age is calculated" },
       { href: "/chronological-age-calculator/", anchor: "chronological age for test scoring" },
       { href: "/hours-calculator/", anchor: "hours calculator" },
       { href: "/bmi-calculator/", anchor: "BMI calculator" },
@@ -829,6 +831,152 @@ export const CALCULATOR_TOOLS: ToolDef[] = [
     features: ["Shift rows with start, end and unpaid break", "Overnight shifts handled automatically", "Weekly totals in h:mm and decimal hours", "Optional pay at an hourly rate; CSV download"],
     indexable: true,
     updated: UPDATED,
+    priority: 1,
+  },
+
+  /* ---------------- Savings and body composition ---------------- */
+  {
+    id: "apy-calculator",
+    path: "/apy-calculator/",
+    name: "APY Calculator",
+    h1: "APY Calculator",
+    title: "APY Calculator – Convert Interest Rate to Annual Yield",
+    metaDescription:
+      "Convert an interest rate to APY, turn APY back into a rate, or work out APY from interest actually paid. Shows the formula and an optional deposit balance.",
+    summary:
+      "Find the annual percentage yield (APY) from a rate and compounding frequency, reverse an APY into its nominal rate, or calculate the APY of interest already paid.",
+    category: "calculator-tools",
+    subgroup: "loans",
+    card: "Convert rates and APY, or find the yield from interest paid.",
+    archetype: "calculator",
+    widget: "calculator",
+    config: { mode: "apy" },
+    aliases: ["annual percentage yield calculator", "apy interest calculator", "savings apy calculator", "interest rate to apy", "apr to apy calculator", "cd apy calculator"],
+    keywords: ["savings", "interest", "compound", "yield", "certificate of deposit"],
+    processing: "browser",
+    limits: [
+      "The balance assumes one deposit, a constant APY, and no fees, tax or withdrawals.",
+      "Banks can change variable rates and may apply tiers, minimums or penalties. Check the account terms; this isn't financial advice.",
+    ],
+    steps: [
+      "Choose what you know: a **rate**, an **APY**, or the **interest actually paid** on a balance.",
+      "Enter the percentage and pick how often interest is **compounded**. For interest paid, enter the principal, the interest and the number of days.",
+      "Optionally add a **deposit** and a **term in months** to see the ending balance.",
+      "Read the result and check the formula underneath, which uses your numbers.",
+    ],
+    example: {
+      title: "5% compounded monthly",
+      input: "Rate 5%, monthly compounding\nDeposit 10,000 for 12 months",
+      output: "APY 5.1162%\nBalance 10,511.62 (interest 511.62)",
+    },
+    sections: [
+      {
+        heading: "Interest rate and APY",
+        body: "The interest rate is the yearly rate before compounding. APY includes the effect of earning interest on interest already added, so it is the number to use when comparing savings accounts that compound at different frequencies.\n\n**APY = (1 + r ÷ n)^n − 1**, where r is the rate as a decimal and n is the number of compounding periods in a year.\n\n| 5% rate, compounded | APY |\n|---|---|\n| Annually | 5.0000% |\n| Twice a year | 5.0625% |\n| Quarterly | 5.0945% |\n| Monthly | 5.1162% |\n| Daily | 5.1267% |\n| Continuously | 5.1271% |",
+      },
+      {
+        heading: "APY from interest you were paid",
+        body: "For a statement or a fixed term, US Regulation DD gives the formula **APY = (1 + interest ÷ principal)^(365 ÷ days) − 1**. For example, $26.68 paid on $1,000 over 183 days is an APY of 5.39%.\n\nUse the balance that actually earned the interest. If you added or withdrew money during the term, a single principal figure won't describe the account and the result will be wrong. Other countries use their own names and rules, such as AER in the UK.",
+      },
+      {
+        heading: "APY is not APR",
+        body: "APY describes what savings earn and includes compounding. APR is usually quoted for borrowing and, depending on the country and product, can include certain fees while excluding compounding. Don't convert a loan APR with this page and treat the answer as the loan's total cost. For repayments, use the [loan EMI calculator](/loan-emi-calculator/).",
+      },
+    ],
+    faq: [
+      {
+        q: "Does a higher APY always mean more money?",
+        a: "Only when the other terms match. Fees, minimum balances, rate tiers, promotional periods and early-withdrawal penalties can change what you actually receive.",
+      },
+      {
+        q: "How do I get the monthly interest from an APY?",
+        a: "The equivalent monthly yield is (1 + APY)^(1 ÷ 12) − 1, not APY ÷ 12. Enter a one-month term with a deposit to see the amount.",
+      },
+    ],
+    sources: [
+      { label: "CFPB: Regulation DD, Appendix A, annual percentage yield calculation", url: "https://www.consumerfinance.gov/rules-policy/regulations/1030/a/" },
+    ],
+    related: ["loan-emi-calculator", "percentage-calculator", "discount-calculator", "gst-calculator"],
+    links: [
+      { href: "/loan-emi-calculator/", anchor: "loan EMI calculator" },
+      { href: "/percentage-calculator/", anchor: "percentage calculator" },
+    ],
+    appCategory: "FinanceApplication",
+    features: ["Rate to APY and APY to rate", "APY from interest paid over a number of days", "Six compounding frequencies", "Optional deposit balance with the formula shown"],
+    indexable: true,
+    updated: "2026-11-26",
+    priority: 1,
+  },
+  {
+    id: "body-fat-calculator",
+    path: "/body-fat-calculator/",
+    name: "Body Fat Calculator",
+    h1: "Body Fat Calculator",
+    title: "Body Fat Calculator – U.S. Navy Tape Measure Method",
+    metaDescription:
+      "Estimate adult body fat percentage from height, neck, waist and hip measurements using the U.S. Navy method, in cm or inches, with its typical error shown.",
+    summary:
+      "Estimate body fat percentage from tape measurements with the U.S. Navy circumference equations. It is an estimate with a typical error of a few points, not a body scan.",
+    category: "calculator-tools",
+    subgroup: "health",
+    card: "Estimate body fat from tape measurements, in cm or inches.",
+    archetype: "calculator",
+    widget: "calculator",
+    config: { mode: "body-fat" },
+    aliases: ["body fat percentage calculator", "navy body fat calculator", "body fat estimator", "body fat calculator tape measure", "bodyfat calculator"],
+    keywords: ["fitness", "waist", "neck", "composition", "lean mass"],
+    processing: "browser",
+    limits: [
+      "For adults. Not for children, teens or during pregnancy.",
+      "A screening estimate, not a diagnosis or a measurement. Talk to a health professional about your own results.",
+    ],
+    steps: [
+      "Choose the **Male** or **Female** equation and **Metric** or **Imperial** units.",
+      "Measure with a flexible tape held level and snug, without compressing the skin. Take each measurement more than once.",
+      "Enter **height**, **neck** and **waist**, plus **hips** for the female equation. Note that the waist site differs between the two equations.",
+      "Read the estimate and its typical error. Add your weight if you want estimated fat and lean mass.",
+    ],
+    example: {
+      title: "Two sets of measurements",
+      input: "Male: height 178, neck 38, waist 85 cm\nFemale: height 165, neck 32, waist 72, hips 96 cm",
+      output: "Male: 16.4%\nFemale: 26.4%",
+    },
+    sections: [
+      {
+        heading: "Where to measure",
+        body: "- **Neck:** just below the larynx.\n- **Waist, male equation:** around the abdomen at the level of the navel.\n- **Waist, female equation:** the narrowest point between the bottom of the breastbone and the navel.\n- **Hips, female equation:** around the widest point.\n- **Height:** standing, without shoes.\n\nA small tape error matters: a centimeter or two at the waist can move the result by more than a percentage point. To track change, measure the same way, at a similar time of day, and compare trends rather than single readings.",
+      },
+      {
+        heading: "The equations",
+        body: "The Navy method estimates body density from circumferences and height, then converts density to fat with the Siri equation, **495 ÷ density − 450**. With centimeters:\n\n- **Male density:** 1.0324 − 0.19077 × log10(waist − neck) + 0.15456 × log10(height)\n- **Female density:** 1.29579 − 0.35004 × log10(waist + hip − neck) + 0.22100 × log10(height)\n\nImperial entries are converted to centimeters first. Some calculators use a separate inch version of the equations, so their answers can differ slightly from this one.",
+      },
+      {
+        heading: "How far to trust the number",
+        body: "The published standard error of estimate is about 3.5 percentage points for men and 3.7 for women. That means many people fall a few points above or below the result, and some further. The equations were developed from US Navy personnel, so they may fit very muscular, very lean, older or higher-weight bodies less well.\n\n[BMI](/bmi-calculator/) answers a different question from weight and height alone. Neither number diagnoses health.",
+      },
+    ],
+    faq: [
+      {
+        q: "Why do I get a different result from smart scales?",
+        a: "Smart scales usually use bioelectrical impedance, which responds to hydration and recent meals. Tape equations have their own errors. Neither is a reference measurement, so compare each method only with itself over time.",
+      },
+      {
+        q: "Why does the female equation need hip measurements?",
+        a: "The female equation was fitted using waist, hip and neck circumferences together with height. The male equation uses only waist, neck and height.",
+      },
+    ],
+    sources: [
+      { label: "National Academies (1998), Assessing Readiness in Military Women, body composition (Table 2-1)", url: "https://nap.nationalacademies.org/read/6104/chapter/4" },
+    ],
+    related: ["bmi-calculator", "percentage-calculator", "age-calculator", "chronological-age-calculator"],
+    links: [
+      { href: "/bmi-calculator/", anchor: "BMI calculator" },
+      { href: "/age-calculator/", anchor: "age calculator" },
+    ],
+    appCategory: "HealthApplication",
+    features: ["Male and female Navy equations", "Centimeters or inches", "Typical error shown with the result", "Optional fat and lean mass"],
+    indexable: true,
+    updated: "2026-11-26",
     priority: 1,
   },
 ];

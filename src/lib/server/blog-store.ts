@@ -2,7 +2,8 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { GridFSBucket, type Collection } from "mongodb";
 import { getTool } from "@/content/tools";
-import legacyPosts from "@/content/legacy-blog.json";
+import retiredPosts from "@/content/legacy-blog.json";
+import seedPosts from "@/content/seed-posts.json";
 import { getDb, mongoConfigured } from "./mongo";
 import {
   LIMITS,
@@ -20,8 +21,8 @@ import {
  * MongoDB blog store.
  *   posts:        collection "blog_posts" (_id = post id, unique index on slug)
  *   images:       GridFS bucket "blog_images" (filename = "uploads/YYYY/MM/name.ext", served by /media/…)
- * The original published guides remain available without MongoDB. With MongoDB configured,
- * a one-time migration imports them without replacing existing posts or resurrecting later deletions.
+ * The bundled articles (seed-posts.json, built from src/content/blog/*.md) are served without MongoDB.
+ * With MongoDB configured, a one-time migration publishes them and retires the earlier guides.
  */
 
 type PostDoc = Omit<BlogPost, "id"> & { _id: string };
@@ -31,7 +32,41 @@ const toDoc = ({ id, ...rest }: BlogPost): PostDoc => ({ _id: id, ...rest });
 
 let indexes: Promise<unknown> | null = null;
 let migration: Promise<void> | null = null;
-const originals = legacyPosts as BlogPost[];
+const originals = seedPosts as BlogPost[];
+/** The guides these articles replaced. Kept only to recognise untouched copies in the database. */
+const retired = retiredPosts as BlogPost[];
+
+/**
+ * Publishes the replacement articles once. An earlier guide is replaced or moved to draft only when
+ * it is still exactly as shipped (same content and modified date). Anything edited in /admin/ is left
+ * alone, a guide deleted there is not brought back, and nothing is deleted from the database.
+ * Old URLs without a new article are redirected or marked gone in src/seo/migration.json.
+ */
+export async function migrateArticles(db: Awaited<ReturnType<typeof getDb>>, col: Collection<PostDoc>): Promise<void> {
+  const migrations = db.collection<{ _id: string; completedAt: Date }>("blog_migrations");
+  const id = "keyword-articles-v2";
+  if (await migrations.findOne({ _id: id })) return;
+  const importedEarlier = Boolean(await migrations.findOne({ _id: "restore-published-guides-v1" }));
+  const untouched = (doc: PostDoc, was: BlogPost) => doc.content === was.content && doc.dateModified === was.dateModified;
+
+  for (const post of originals) {
+    const was = retired.find((p) => p.slug === post.slug);
+    const existing = await col.findOne({ slug: post.slug });
+    if (!existing) {
+      if (was && importedEarlier) continue;
+      await col.updateOne({ slug: post.slug }, { $setOnInsert: toDoc(post) }, { upsert: true });
+    } else if (was && untouched(existing, was)) {
+      const { _id, ...rest } = { ...toDoc(post), _id: existing._id };
+      await col.updateOne({ _id }, { $set: rest });
+    }
+  }
+  for (const was of retired) {
+    if (originals.some((p) => p.slug === was.slug)) continue;
+    const existing = await col.findOne({ slug: was.slug });
+    if (existing && untouched(existing, was)) await col.updateOne({ _id: existing._id }, { $set: { status: "draft" } });
+  }
+  await migrations.updateOne({ _id: id }, { $set: { completedAt: new Date() } }, { upsert: true });
+}
 
 async function posts(): Promise<Collection<PostDoc>> {
   const db = await getDb();
@@ -45,15 +80,7 @@ async function posts(): Promise<Collection<PostDoc>> {
     throw e;
   });
   await indexes;
-  migration ??= (async () => {
-    const migrations = db.collection<{ _id: string; completedAt: Date }>("blog_migrations");
-    const id = "restore-published-guides-v1";
-    if (await migrations.findOne({ _id: id })) return;
-    await col.bulkWrite(originals.map((post) => ({
-      updateOne: { filter: { slug: post.slug }, update: { $setOnInsert: toDoc(post) }, upsert: true },
-    })));
-    await migrations.updateOne({ _id: id }, { $set: { completedAt: new Date() } }, { upsert: true });
-  })().catch((e) => { migration = null; throw e; });
+  migration ??= migrateArticles(db, col).catch((e) => { migration = null; throw e; });
   await migration;
   return col;
 }

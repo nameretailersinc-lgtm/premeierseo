@@ -55,7 +55,7 @@ export const TEXT_TOOLS: ToolDef[] = [
       },
       {
         heading: "Typical word counts for essays, articles and posts",
-        body: "| Text | Usual length |\n|---|---|\n| College application essay | 250–650 words |\n| News article | 400–800 words |\n| Blog post | 800–2,000 words |\n| 5-minute speech | about 700 words |\n| One double-spaced page (12 pt) | about 250–300 words |\n\nFor page estimates in different fonts and spacings, see [how many pages is 1,000 words](/blog/how-many-pages-is-1000-words/).",
+        body: "| Text | Usual length |\n|---|---|\n| College application essay | 250–650 words |\n| News article | 400–800 words |\n| Blog post | 800–2,000 words |\n| 5-minute speech | about 700 words |\n| One double-spaced page (12 pt) | about 250–300 words |\n\nFor what counts toward a limit and how pages relate to words, see [how to count the words in an essay](/blog/how-to-count-words-in-an-essay/).",
       },
     ],
     faq: [
@@ -84,12 +84,13 @@ export const TEXT_TOOLS: ToolDef[] = [
     ],
     related: ["character-counter", "reading-time-calculator", "keyword-density-checker", "remove-extra-spaces", "online-notepad"],
     links: [
+      { href: "/blog/how-to-count-words-in-an-essay/", anchor: "counting words in an essay" },
       { href: "/character-counter/", anchor: "character counter with platform limits" },
       { href: "/reading-time-calculator/", anchor: "reading time calculator" },
       { href: "/keyword-density-checker/", anchor: "check keyword density" },
       { href: "/online-notepad/", anchor: "online notepad" },
     ],
-    guides: ["/blog/how-many-pages-is-1000-words/"],
+    guides: ["/blog/how-to-count-words-in-an-essay/"],
     appCategory: "UtilitiesApplication",
     features: [
       "Word, character, sentence and paragraph counts",
@@ -1819,9 +1820,7 @@ export const TEXT_TOOLS: ToolDef[] = [
       { href: "/word-counter/", anchor: "word counter" },
       { href: "/meta-description-generator/", anchor: "meta description generator" },
       { href: "/serp-simulator/", anchor: "preview your search snippet" },
-      { href: "/blog/character-limits-cheat-sheet/", anchor: "social media character limits" },
-    ],
-    guides: ["/blog/character-limits-cheat-sheet/"],
+    ],
     appCategory: "UtilitiesApplication",
     features: [
       "Characters with and without spaces, words and lines",
@@ -1887,7 +1886,7 @@ export const TEXT_TOOLS: ToolDef[] = [
       },
       {
         heading: "Timing speeches and presentations",
-        body: "Spoken delivery is slower than reading aloud because of pauses, emphasis and audience reactions. The default speaking pace of 140 words per minute is comfortable for most talks; nervous speakers often run faster, so rehearse with a timer.\n\nType a length into **Minutes** to see how many words to write: a 5-minute speech is about 700 words, a 10-minute talk about 1,400, and a 2-minute wedding toast about 280. Leave room for slides, applause and questions. For page counts, see [how many pages is 1,000 words](/blog/how-many-pages-is-1000-words/).",
+        body: "Spoken delivery is slower than reading aloud because of pauses, emphasis and audience reactions. The default speaking pace of 140 words per minute is comfortable for most talks; nervous speakers often run faster, so rehearse with a timer.\n\nType a length into **Minutes** to see how many words to write: a 5-minute speech is about 700 words, a 10-minute talk about 1,400, and a 2-minute wedding toast about 280. Leave room for slides, applause and questions. For page counts, see [how many pages is 1,000 words](/blog/how-to-count-words-in-an-essay/).",
       },
     ],
     faq: [
@@ -1913,11 +1912,11 @@ export const TEXT_TOOLS: ToolDef[] = [
     related: ["word-counter", "character-counter", "online-notepad", "lorem-ipsum-generator", "online-text-editor"],
     links: [
       { href: "/word-counter/", anchor: "word counter" },
-      { href: "/blog/how-many-pages-is-1000-words/", anchor: "how many pages is 1,000 words" },
+      { href: "/blog/how-to-count-words-in-an-essay/", anchor: "counting words in an essay" },
       { href: "/text-summarizer/", anchor: "text summarizer" },
       { href: "/essay-checker/", anchor: "essay checker" },
     ],
-    guides: ["/blog/how-many-pages-is-1000-words/"],
+    guides: ["/blog/how-to-count-words-in-an-essay/"],
     appCategory: "UtilitiesApplication",
     features: [
       "Silent reading, reading aloud and speaking times",

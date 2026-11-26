@@ -10,7 +10,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { useTool } from "../ui/ToolContext";
 import { Alert, Button, Checkbox, DownloadButton, Panel, Segmented, useDebounced, usePersistentOptions } from "../ui/primitives";
 import type { WidgetProps } from "../types";
-import { contrastRatio, emailPayload, isLighter, matrixToSvg, phonePayload, pngScale, urlPayload, vcardPayload, wifiPayload, type Matrix, type QrKind } from "../lib/calc/qr";
+import { LOGO_PERCENT, contrastRatio, emailPayload, isLighter, logoLayout, matrixToSvg, phonePayload, pngScale, urlPayload, vcardPayload, wifiPayload, type Matrix, type QrKind, type QrLogo } from "../lib/calc/qr";
 
 type Ecc = "L" | "M" | "Q" | "H";
 type QrFactory = typeof import("qrcode-generator");
@@ -28,6 +28,33 @@ async function loadQr(): Promise<QrFactory> {
   f.stringToBytes = (s: string) => Array.from(enc.encode(s));
   factory = f;
   return f;
+}
+
+const LOGO_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("unreadable image"));
+    img.src = src;
+  });
+}
+
+/** Re-encodes the chosen file as a PNG of at most 512 px, which also drops its metadata. */
+async function readLogo(file: File): Promise<{ href: string; aspect: number }> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const scale = Math.min(1, 512 / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return { href: canvas.toDataURL("image/png"), aspect: canvas.width / canvas.height };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 function Text({ id, label, value, onChange, placeholder, type = "text", help }: { id: string; label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; help?: string }) {
@@ -53,6 +80,9 @@ export default function QrCode({ toolId }: WidgetProps) {
   const [mail, setMail] = useState({ to: "", subject: "", body: "" });
   const [phone, setPhone] = useState("");
   const [vc, setVc] = useState({ first: "", last: "", org: "", title: "", phone: "", email: "", url: "" });
+  const [logoImage, setLogoImage] = useState<{ href: string; aspect: number } | null>(null);
+  const [logoPercent, setLogoPercent] = useState<number>(LOGO_PERCENT.initial);
+  const [logoProblem, setLogoProblem] = useState("");
   const [matrix, setMatrix] = useState<Matrix | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [msg, setMsg] = useState("");
@@ -74,6 +104,7 @@ export default function QrCode({ toolId }: WidgetProps) {
     }
   }, [o.kind, url, text, wifi, mail, phone, vc]);
   const debounced = useDebounced(payload, 200);
+  const ecc: Ecc = logoImage ? "H" : o.ecc;
 
   useEffect(() => {
     let cancelled = false;
@@ -87,7 +118,7 @@ export default function QrCode({ toolId }: WidgetProps) {
     loadQr()
       .then((qrcode) => {
         if (cancelled) return;
-        const qr = qrcode(0, o.ecc);
+        const qr = qrcode(0, ecc);
         qr.addData(debounced, "Byte");
         qr.make();
         const size = qr.getModuleCount();
@@ -107,16 +138,18 @@ export default function QrCode({ toolId }: WidgetProps) {
     return () => {
       cancelled = true;
     };
-  }, [debounced, o.ecc, error, announce]);
+  }, [debounced, ecc, error, announce]);
 
   const fg = HEX.test(o.fg) ? o.fg : "#000000";
   const bg = HEX.test(o.bg) ? o.bg : "#ffffff";
   const ratio = contrastRatio(fg, bg);
   const inverted = isLighter(fg, bg);
   const px = Math.max(64, Math.min(4096, Math.round(o.px) || 512));
-  const svg = matrix ? matrixToSvg(matrix, { margin: o.margin, fg, bg, px }) : "";
+  const margin = Math.max(4, Math.min(10, Math.round(o.margin) || 4));
+  const logo: QrLogo | null = logoImage ? { ...logoImage, percent: logoPercent } : null;
+  const svg = matrix ? matrixToSvg(matrix, { margin, fg, bg, px, logo }) : "";
   const src = svg ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}` : "";
-  const sc = matrix ? pngScale(matrix.size, o.margin, px) : null;
+  const sc = matrix ? pngScale(matrix.size, margin, px) : null;
 
   const png = async (): Promise<Blob> => {
     if (!matrix || !sc) throw new Error("No QR code");
@@ -126,7 +159,14 @@ export default function QrCode({ toolId }: WidgetProps) {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, sc.width, sc.width);
     ctx.fillStyle = fg;
-    for (let r = 0; r < matrix.size; r++) for (let c = 0; c < matrix.size; c++) if (matrix.dark(r, c)) ctx.fillRect((c + o.margin) * sc.scale, (r + o.margin) * sc.scale, sc.scale, sc.scale);
+    for (let r = 0; r < matrix.size; r++) for (let c = 0; c < matrix.size; c++) if (matrix.dark(r, c)) ctx.fillRect((c + margin) * sc.scale, (r + margin) * sc.scale, sc.scale, sc.scale);
+    if (logo) {
+      const { image, plate } = logoLayout(matrix.size, margin, logo);
+      ctx.fillStyle = bg;
+      ctx.fillRect(plate.x * sc.scale, plate.y * sc.scale, plate.w * sc.scale, plate.h * sc.scale);
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(await loadImage(logo.href), image.x * sc.scale, image.y * sc.scale, image.w * sc.scale, image.h * sc.scale);
+    }
     return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("PNG failed"))), "image/png"));
   };
 
@@ -223,12 +263,17 @@ export default function QrCode({ toolId }: WidgetProps) {
                 <label htmlFor={`${id}-ecc`} className="field-label">
                   Error correction
                 </label>
-                <select id={`${id}-ecc`} className="select" value={o.ecc} onChange={(e) => set("ecc", e.target.value as Ecc)}>
+                <select id={`${id}-ecc`} className="select" value={ecc} disabled={!!logoImage} aria-describedby={logoImage ? `${id}-ecc-help` : undefined} onChange={(e) => set("ecc", e.target.value as Ecc)}>
                   <option value="L">L: recovers about 7% damage</option>
                   <option value="M">M: about 15% (default)</option>
                   <option value="Q">Q: about 25%</option>
                   <option value="H">H: about 30%</option>
                 </select>
+                {logoImage && (
+                  <p id={`${id}-ecc-help`} className="field-help">
+                    Locked to H while a logo covers part of the code.
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor={`${id}-px`} className="field-label">
@@ -240,7 +285,7 @@ export default function QrCode({ toolId }: WidgetProps) {
                 <label htmlFor={`${id}-margin`} className="field-label">
                   Quiet zone (modules)
                 </label>
-                <input id={`${id}-margin`} type="number" min={0} max={10} className="input tabular-nums" value={o.margin} onChange={(e) => set("margin", Math.max(0, Math.min(10, Math.round(Number(e.target.value)) || 0)))} />
+                <input id={`${id}-margin`} type="number" min={4} max={10} className="input tabular-nums" value={margin} onChange={(e) => set("margin", Math.max(4, Math.min(10, Math.round(Number(e.target.value)) || 4)))} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -257,6 +302,51 @@ export default function QrCode({ toolId }: WidgetProps) {
                 </div>
               </div>
             </div>
+            <div className="mt-4 grid gap-3 border-t border-line pt-4">
+              <div>
+                <label htmlFor={`${id}-logo`} className="field-label">
+                  Logo in the center (optional)
+                </label>
+                <input
+                  id={`${id}-logo`}
+                  key={logoImage ? "has-logo" : "no-logo"}
+                  type="file"
+                  accept={LOGO_TYPES.join(",")}
+                  className="input h-auto py-2"
+                  aria-describedby={`${id}-logo-help`}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (!LOGO_TYPES.includes(file.type) || file.size > 5 * 1024 * 1024) {
+                      setLogoProblem("Choose a PNG, JPG or WebP image up to 5 MB.");
+                      error("LOGO_TYPE", "input");
+                      return;
+                    }
+                    used("file");
+                    readLogo(file)
+                      .then((l) => (setLogoImage(l), setLogoProblem(""), announce("Logo added")))
+                      .catch(() => (setLogoProblem("That image couldn't be read. Try a different PNG or JPG."), error("LOGO_DECODE", "input")));
+                  }}
+                />
+                <p id={`${id}-logo-help`} className="field-help">
+                  The image stays in your browser. Scan the downloaded code with your phone before printing it.
+                </p>
+              </div>
+              {logoProblem && <Alert tone="danger">{logoProblem}</Alert>}
+              {logoImage && (
+                <div className="flex flex-wrap items-end gap-3">
+                  <div className="min-w-48 flex-1">
+                    <label htmlFor={`${id}-logo-size`} className="field-label">
+                      Logo width: {logoPercent}% of the code
+                    </label>
+                    <input id={`${id}-logo-size`} type="range" min={LOGO_PERCENT.min} max={LOGO_PERCENT.max} value={logoPercent} className="w-full" onChange={(e) => setLogoPercent(Number(e.target.value))} />
+                  </div>
+                  <Button variant="ghost" icon="trash" onClick={() => setLogoImage(null)}>
+                    Remove logo
+                  </Button>
+                </div>
+              )}
+            </div>
             {inverted && (
               <div className="mt-3">
                 <Alert tone="warning">The foreground is lighter than the background. Many phone cameras can&apos;t read inverted QR codes; use a dark code on a light background.</Alert>
@@ -267,7 +357,7 @@ export default function QrCode({ toolId }: WidgetProps) {
                 <Alert tone="warning">Low contrast ({ratio.toFixed(1)}:1). Codes with weak contrast often fail to scan; aim for dark modules on a light background, at least 4.5:1.</Alert>
               </div>
             )}
-            {o.margin < 4 && <p className="mt-3 text-sm text-ink-3">The QR standard asks for a 4-module quiet zone. Keep at least that much blank space around the code when you place it.</p>}
+            <p className="mt-3 text-sm text-ink-3">A blank quiet zone of at least four modules is included. Keep it clear when placing or printing the code.</p>
             <Button variant="ghost" icon="rotate-ccw" className="mt-3" onClick={() => setO((p) => ({ ...DEFAULTS, kind: p.kind }))}>
               Reset appearance
             </Button>

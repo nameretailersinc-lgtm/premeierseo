@@ -34,6 +34,8 @@ import {
 } from "../lib/calc/money";
 import { ASIAN_ACTION_POINTS, IN_TO_M, LB_TO_KG, WHO_CATEGORIES, bmi as bmiOf, category, healthyRangeKg } from "../lib/calc/bmi";
 import { convertAll, type SizeUnit } from "../lib/calc/bytes";
+import { apyFromInterest, apyFromRate, balanceAfter, rateFromApy } from "../lib/calc/apy";
+import { navyBodyFat, type Sex } from "../lib/calc/bodyfat";
 import { BigResult, CurrencySelect, Formula, NumInput, ResultRows, useAnnounceResult, useCurrencyCode } from "../lib/calc/ui";
 
 const DASH = "—";
@@ -851,6 +853,304 @@ function BmiCalc({ toolId }: { toolId: string }) {
   );
 }
 
+/* =============================== Body fat =============================== */
+
+function BodyFatCalc({ toolId }: { toolId: string }) {
+  const id = useId();
+  const { used, announce, completed } = useTool();
+  const [opts, setOpts] = usePersistentOptions(toolId, { units: "metric" as "metric" | "imperial", sex: "male" as Sex });
+  const [v, setV] = useState({ height: "", neck: "", waist: "", hip: "", weight: "" });
+  const metric = opts.units === "metric";
+  const female = opts.sex === "female";
+  const toCm = (s: string) => parseNum(s) * (metric ? 1 : 2.54);
+  const heightCm = toCm(v.height);
+  const neckCm = toCm(v.neck);
+  const waistCm = toCm(v.waist);
+  const hipCm = toCm(v.hip);
+  const needed = female ? [v.height, v.neck, v.waist, v.hip] : [v.height, v.neck, v.waist];
+  const hasInput = needed.every((s) => s.trim());
+  const within = (n: number, lo: number, hi: number) => n >= lo && n <= hi;
+  const plausible =
+    within(heightCm, 120, 250) && within(neckCm, 20, 80) && within(waistCm, 40, 250) && (!female || within(hipCm, 50, 250));
+  const r = hasInput && plausible ? navyBodyFat({ sex: opts.sex, heightCm, neckCm, waistCm, hipCm }) : null;
+  const shown = r ? `${(Math.round(r.percent * 10) / 10).toFixed(1)}%` : DASH;
+  const weight = parseNum(v.weight);
+  const fatMass = r && weight > 0 ? (weight * r.percent) / 100 : NaN;
+  const wUnit = metric ? "kg" : "lb";
+  const lUnit = metric ? "cm" : "in";
+  const lines = r
+    ? [
+        female
+          ? "Body fat % = 495 ÷ (1.29579 − 0.35004 × log10(waist + hip − neck) + 0.22100 × log10(height)) − 450"
+          : "Body fat % = 495 ÷ (1.0324 − 0.19077 × log10(waist − neck) + 0.15456 × log10(height)) − 450",
+        `Centimeters used: ${female ? "waist + hip − neck" : "waist − neck"} = ${plain(r.girth, 2)}; height = ${plain(heightCm, 2)}`,
+        `Estimated body density ${plain(r.density, 4)} → 495 ÷ ${plain(r.density, 4)} − 450 = ${plain(r.percent, 2)}`,
+      ]
+    : [];
+  useAnnounceResult(r ? `Estimated body fat ${shown}` : null, announce, completed);
+
+  const field = (label: string, key: keyof typeof v, suffix: string, help?: string) => (
+    <div>
+      <label htmlFor={`${id}-${key}`} className="field-label">
+        {label}
+      </label>
+      <NumInput
+        id={`${id}-${key}`}
+        value={v[key]}
+        suffix={suffix}
+        describedBy={help ? `${id}-${key}-help` : undefined}
+        onChange={(x) => {
+          setV((s) => ({ ...s, [key]: x }));
+          used("type");
+        }}
+      />
+      {help && (
+        <p id={`${id}-${key}-help`} className="field-help">
+          {help}
+        </p>
+      )}
+    </div>
+  );
+
+  return (
+    <Shell
+      onExample={() => {
+        used("example");
+        setV(
+          metric
+            ? female
+              ? { height: "165", neck: "32", waist: "72", hip: "96", weight: "60" }
+              : { height: "178", neck: "38", waist: "85", hip: "", weight: "78" }
+            : female
+              ? { height: "65", neck: "12.5", waist: "28.5", hip: "38", weight: "132" }
+              : { height: "70", neck: "15", waist: "33.5", hip: "", weight: "172" },
+        );
+      }}
+      onReset={() => setV({ height: "", neck: "", waist: "", hip: "", weight: "" })}
+      copyText={r ? `Estimated body fat ${shown} (U.S. Navy circumference method)` : ""}
+      inputs={
+        <>
+          <Alert tone="info">An adult estimate from a tape measure, not a measurement of body fat. It is not for children or pregnancy.</Alert>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Segmented
+              legend="Equation"
+              value={opts.sex}
+              onChange={(s) => setOpts((o) => ({ ...o, sex: s }))}
+              options={[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+              ]}
+            />
+            <Segmented
+              legend="Units"
+              value={opts.units}
+              onChange={(u) => {
+                setOpts((o) => ({ ...o, units: u }));
+                // Numbers typed in one unit are meaningless in the other.
+                setV({ height: "", neck: "", waist: "", hip: "", weight: "" });
+              }}
+              options={[
+                { value: "metric", label: "Metric (cm)" },
+                { value: "imperial", label: "Imperial (in)" },
+              ]}
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {field("Height", "height", lUnit)}
+            {field("Neck", "neck", lUnit, "Just below the larynx (voice box).")}
+            {field("Waist", "waist", lUnit, female ? "At the narrowest point, above the navel." : "Level with the navel.")}
+            {female && field("Hips", "hip", lUnit, "Around the widest point.")}
+            {field("Weight (optional)", "weight", wUnit, "Only used to split weight into fat and lean mass.")}
+          </div>
+        </>
+      }
+      result={
+        <>
+          <BigResult label="Estimated body fat" value={shown} sub={r ? `Typical equation error is about ±${female ? "3.7" : "3.5"} percentage points (one standard error).` : null} />
+          {hasInput && !r && (
+            <p className="text-sm text-danger">
+              These measurements can&apos;t give a sensible estimate. Check the units and each tape measurement.
+            </p>
+          )}
+          {Number.isFinite(fatMass) && (
+            <ResultRows
+              rows={[
+                ["Estimated fat mass", `${fmtNum(fatMass, 1)} ${wUnit}`],
+                ["Estimated lean mass", `${fmtNum(weight - fatMass, 1)} ${wUnit}`],
+              ]}
+            />
+          )}
+          <Formula lines={lines} />
+        </>
+      }
+    />
+  );
+}
+
+/* =============================== APY =============================== */
+
+const COMPOUNDING: { value: string; label: string; n: number }[] = [
+  { value: "365", label: "Daily (365 a year)", n: 365 },
+  { value: "12", label: "Monthly", n: 12 },
+  { value: "4", label: "Quarterly", n: 4 },
+  { value: "2", label: "Twice a year", n: 2 },
+  { value: "1", label: "Annually", n: 1 },
+  { value: "cont", label: "Continuously", n: Infinity },
+];
+
+function ApyCalc({ toolId }: { toolId: string }) {
+  const id = useId();
+  const { used, announce, completed } = useTool();
+  const [opts, setOpts] = usePersistentOptions(toolId, { mode: "apy" as "apy" | "rate" | "earned", freq: "12", currency: "" });
+  const currency = useCurrencyCode(opts.currency);
+  const [pct, setPct] = useState("");
+  const [deposit, setDeposit] = useState("");
+  const [months, setMonths] = useState("12");
+  const [interest, setInterest] = useState("");
+  const [days, setDays] = useState("");
+  const { mode } = opts;
+  const freq = COMPOUNDING.find((c) => c.value === opts.freq) ?? COMPOUNDING[1];
+
+  const input = parseNum(pct) / 100;
+  const dep = parseNum(deposit);
+  const term = parseNum(months);
+  const rateOk = input >= 0 && input <= 1;
+  let apy = NaN;
+  let rate = NaN;
+  if (mode === "apy" && rateOk) {
+    rate = input;
+    apy = apyFromRate(rate, freq.n);
+  } else if (mode === "rate" && rateOk) {
+    apy = input;
+    rate = rateFromApy(apy, freq.n);
+  } else if (mode === "earned") {
+    const earned = parseNum(interest);
+    const d = parseNum(days);
+    if (dep > 0 && earned >= 0 && d >= 1 && d <= 36500) apy = apyFromInterest(dep, earned, d);
+  }
+  const ready = Number.isFinite(apy);
+  const percent = (x: number) => `${(x * 100).toFixed(4).replace(/0{1,2}$/, "")}%`;
+  const main = !ready ? DASH : mode === "rate" ? percent(rate) : percent(apy);
+  const showBalance = ready && mode !== "earned" && dep > 0 && term > 0 && term <= 600;
+  const balance = showBalance ? balanceAfter(dep, apy, term) : NaN;
+  const label = mode === "rate" ? "Nominal annual rate" : "Annual percentage yield (APY)";
+  const lines = !ready
+    ? []
+    : mode === "earned"
+      ? [
+          "APY = (1 + interest ÷ principal)^(365 ÷ days) − 1",
+          `(1 + ${plain(parseNum(interest), 2)} ÷ ${plain(dep, 2)})^(365 ÷ ${plain(parseNum(days), 0)}) − 1 = ${percent(apy)}`,
+        ]
+      : Number.isFinite(freq.n)
+        ? mode === "apy"
+          ? ["APY = (1 + r ÷ n)^n − 1", `(1 + ${plain(rate, 6)} ÷ ${freq.n})^${freq.n} − 1 = ${percent(apy)}`]
+          : ["r = n × ((1 + APY)^(1 ÷ n) − 1)", `${freq.n} × ((1 + ${plain(apy, 6)})^(1 ÷ ${freq.n}) − 1) = ${percent(rate)}`]
+        : mode === "apy"
+          ? ["APY = e^r − 1", `e^${plain(rate, 6)} − 1 = ${percent(apy)}`]
+          : ["r = ln(1 + APY)", `ln(1 + ${plain(apy, 6)}) = ${percent(rate)}`];
+  useAnnounceResult(ready ? `${label} ${main}` : null, announce, completed);
+
+  const field = (text: string, value: string, set: (s: string) => void, key: string, suffix?: string) => (
+    <div>
+      <label htmlFor={`${id}-${key}`} className="field-label">
+        {text}
+      </label>
+      <NumInput
+        id={`${id}-${key}`}
+        value={value}
+        suffix={suffix}
+        onChange={(x) => {
+          set(x);
+          used("type");
+        }}
+      />
+    </div>
+  );
+
+  return (
+    <Shell
+      onExample={() => {
+        used("example");
+        if (mode === "earned") {
+          setDeposit("1000");
+          setInterest("26.68");
+          setDays("183");
+        } else {
+          setPct(mode === "apy" ? "5" : "5.1162");
+          setDeposit("10000");
+          setMonths("12");
+        }
+      }}
+      onReset={() => {
+        [setPct, setDeposit, setInterest, setDays].forEach((s) => s(""));
+        setMonths("12");
+      }}
+      copyText={ready ? `${label}: ${main}` : ""}
+      inputs={
+        <>
+          <Segmented
+            legend="What do you know?"
+            value={mode}
+            onChange={(m) => {
+              setOpts((o) => ({ ...o, mode: m }));
+              setPct("");
+            }}
+            options={[
+              { value: "apy", label: "Rate → APY" },
+              { value: "rate", label: "APY → rate" },
+              { value: "earned", label: "Interest paid → APY" },
+            ]}
+          />
+          {mode === "earned" ? (
+            <div className="grid gap-4 sm:grid-cols-3">
+              {field("Principal", deposit, setDeposit, "dep")}
+              {field("Interest earned", interest, setInterest, "int")}
+              {field("Days in term", days, setDays, "days")}
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {field(mode === "apy" ? "Annual interest rate" : "APY", pct, setPct, "pct", "%")}
+                <div>
+                  <label htmlFor={`${id}-freq`} className="field-label">
+                    Compounding
+                  </label>
+                  <select id={`${id}-freq`} className="select" value={opts.freq} onChange={(e) => setOpts((o) => ({ ...o, freq: e.target.value }))}>
+                    {COMPOUNDING.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {field("Deposit (optional)", deposit, setDeposit, "dep")}
+                {field("Term (months)", months, setMonths, "months")}
+              </div>
+              <CurrencySelect id={`${id}-cur`} value={opts.currency} onChange={(c) => setOpts((o) => ({ ...o, currency: c }))} />
+              {pct.trim() !== "" && !rateOk && <p className="text-sm text-danger">Enter a percentage from 0 to 100.</p>}
+            </>
+          )}
+        </>
+      }
+      result={
+        <>
+          <BigResult label={label} value={main} sub={ready && mode !== "earned" ? `Compounded: ${freq.label.toLowerCase()}` : null} />
+          {showBalance && (
+            <ResultRows
+              rows={[
+                [`Balance after ${plain(term, 0)} months`, fmtMoney(balance, currency)],
+                ["Interest earned", fmtMoney(balance - dep, currency)],
+              ]}
+            />
+          )}
+          {showBalance && <p className="text-sm text-ink-3">Assumes the APY stays the same, with no further deposits, withdrawals, fees or tax.</p>}
+          <Formula lines={lines} />
+        </>
+      }
+    />
+  );
+}
+
 /* =============================== AdSense =============================== */
 
 function AdsenseCalc({ toolId }: { toolId: string }) {
@@ -1122,6 +1422,10 @@ export default function Calculator({ toolId, config }: WidgetProps) {
       return <BmiCalc toolId={toolId} />;
     case "adsense":
       return <AdsenseCalc toolId={toolId} />;
+    case "body-fat":
+      return <BodyFatCalc toolId={toolId} />;
+    case "apy":
+      return <ApyCalc toolId={toolId} />;
     case "mb-kb":
       return <SizeCalc toolId={toolId} />;
     default:

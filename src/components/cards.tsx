@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "./Icon";
-import { TOOLS } from "@/content/tools";
+import { PUBLIC_TOOLS } from "@/content/tools";
 import { categoryArt, toolArt } from "@/lib/illustrations";
 import { toolHue, toolIcon } from "@/lib/tool-icon";
 import type { CategoryDef, CategoryId, ToolDef } from "@/lib/types";
@@ -9,7 +9,7 @@ import type { CategoryDef, CategoryId, ToolDef } from "@/lib/types";
 /** Tools listed on each hub: its own tools plus those cross-listed into it ("Also useful here"). */
 export function categoryCounts(): Record<CategoryId, number> {
   const out = {} as Record<CategoryId, number>;
-  for (const t of TOOLS) {
+  for (const t of PUBLIC_TOOLS) {
     out[t.category] = (out[t.category] ?? 0) + 1;
     for (const c of t.alsoIn ?? []) out[c] = (out[c] ?? 0) + 1;
   }

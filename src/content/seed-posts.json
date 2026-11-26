@@ -1,0 +1,774 @@
+[
+  {
+    "id": "article-301-vs-302-redirects",
+    "slug": "301-vs-302-redirects",
+    "status": "published",
+    "title": "301 vs 302 Redirects: Which to Use and How to Check Them",
+    "excerpt": "Choose the redirect that matches your intention, then verify every hop, including after an HTTPS or URL change.",
+    "content": "A 301 says a page has moved permanently. A 302 says it is somewhere else for now. Pick the one that matches what you intend, then check for a 301 redirect actually behaving that way.\n\n## What each code tells Google\n\n![Diagram comparing how a 301 permanent redirect and a 302 temporary redirect are treated in search results](/blog-images/301-vs-302-redirects-example.jpg \"Google's documented treatment of permanent and temporary redirects.\")\n\nGoogle's documentation says permanent redirects show the **new** address in search results, while temporary redirects keep showing the **original** one.\n\n| Status | Meaning | Request method |\n| --- | --- | --- |\n| 301 | Moved permanently | Clients may change POST to GET |\n| 308 | Moved permanently | Method is preserved |\n| 302 | Found, temporary | Clients may change POST to GET |\n| 307 | Temporary redirect | Method is preserved |\n\nUse 301 or 308 for a changed URL, a merged page or a new domain. Use 302 or 307 for a short-term detour, such as a temporary maintenance page. If a \"temporary\" move becomes permanent, change the code.\n\n## Prefer server redirects\n\nSet redirects on the server or CDN. Google treats an instant meta refresh as permanent and a delayed one as temporary. It advises JavaScript redirects only when the other methods are not possible, because Google might not see them if rendering fails.\n\n## Check every hop\n\n1. Open the [Redirect Checker](/redirect-checker/).\n2. Enter the full old address, including `http://` if you want to test the HTTPS step.\n3. Confirm the first status code, each Location value and that the final response is 200.\n4. Test several URLs together with bulk mode, up to 20 at a time.\n\nThe checker follows HTTP redirects. It does not detect meta refresh or JavaScript redirects, and a site may answer our server differently from your browser.\n\n## Fix chains and loops\n\nA **chain** sends visitors through several addresses, for example HTTP to HTTPS, then to www, then to the new path. Point each old URL directly at the final one. A **loop** returns to an address already visited; look for two rules that undo each other, often between a CDN and the origin server.\n\n## Moving to HTTPS or new URLs\n\n- List old URLs and map each to its closest equivalent. Do not send them all to the homepage.\n- Update internal links, canonical tags and sitemaps to the new addresses.\n- Install a valid certificate for every hostname that redirects.\n- Test after deployment, then watch Search Console for errors.\n\nFor server rules, the [.htaccess redirect generator](/htaccess-redirect-generator/) creates Apache directives. Test them on a staging copy first. To control crawling rather than move pages, see [how to create a robots.txt file](/blog/robots-txt-guide/).",
+    "category": "Technical SEO",
+    "tags": [
+      "redirects",
+      "site migration",
+      "https"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/301-vs-302-redirects.jpg",
+      "alt": "Illustration comparing a permanent 301 redirect with a temporary 302 redirect",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "301 vs 302 Redirects and How to Check Them",
+      "metaDescription": "When to use a 301 or a 302, how Google treats each, and how to check for a 301 redirect, long chains and loops before and after you move your website pages.",
+      "focusKeyword": "check for 301 redirect",
+      "secondaryKeywords": [
+        "301 redirect checker",
+        "check website for redirects"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "How long should I keep a 301 redirect?",
+        "a": "Google advises keeping redirects for as long as possible, generally at least one year. For visitors with old links, keeping them indefinitely is better still."
+      },
+      {
+        "q": "Should every removed page redirect to the homepage?",
+        "a": "No. Redirect only to a page that genuinely replaces the old one. If there is no replacement, returning 404 or 410 is clearer."
+      }
+    ],
+    "relatedTools": [
+      "redirect-checker",
+      "http-status-checker",
+      "htaccess-redirect-generator",
+      "canonical-url-generator"
+    ],
+    "datePublished": "2026-10-06T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-10-06T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-calculate-age-from-date-of-birth",
+    "slug": "how-to-calculate-age-from-date-of-birth",
+    "status": "published",
+    "title": "How to Calculate Age From a Date of Birth (With Examples)",
+    "excerpt": "The method behind an exact age in years, months and days, including the awkward cases that make two calculators disagree.",
+    "content": "To calculate age using date of birth, count the full years first, then the full months after the last birthday, then the remaining days. The age on a form is usually just the full years.\n\n## Find the age in completed years\n\n1. Subtract the birth year from the year of the date you are measuring on.\n2. If the birthday has not happened yet in that year, subtract 1.\n\n**Example:** born 15 August 2000, measured on 26 November 2026. 2026 − 2000 = 26. The August birthday has passed, so the age is **26**.\n\nMeasured on 1 March 2026 instead, 2026 − 2000 = 26, but the birthday has not happened yet, so the age is **25**.\n\n## Add months and days\n\nStart from the most recent birthday and count whole months until the next one would pass your date. Then count the days left over.\n\nFor 15 August 2000 to 26 November 2026:\n\n- Most recent birthday: 15 August 2026.\n- Whole months: 15 September, 15 October, 15 November, which is 3.\n- Days from 15 November to 26 November: 11.\n\nThe exact age is **26 years, 3 months and 11 days**.\n\n![The age calculator showing an age in years, months and days with totals](/blog-images/how-to-calculate-age-from-date-of-birth-example.jpg \"A calculator also gives totals in months, weeks and days, which are tedious to count by hand.\")\n\n## Month ends need a rule\n\nWhat is one month after 31 January? February has no 31st. One common approach, used by the [Age Calculator](/age-calculator/), treats the last day of the shorter month as the anniversary. Another approach \"borrows\" a fixed 30 days. Some test manuals require that second method; the [chronological age calculator](/chronological-age-calculator/) is meant for those cases. Use the method your form or manual asks for.\n\n## Leap years\n\nA year is a leap year if it divides by 4, except for century years, which must divide by 400. So 2000 and 2024 are leap years, while 1900 and 2100 are not. Counting total days lived has to include each 29 February in the period.\n\n## Spreadsheet shortcut\n\nIn Excel and Google Sheets, `DATEDIF(birth, date, \"Y\")` returns completed years. For example, with the birth date in A2:\n\n`=DATEDIF(A2, TODAY(), \"Y\")`\n\nDo not divide the number of days by 365. Leap days make that drift, and it can report the wrong age close to a birthday.\n\n## Common mistakes\n\n- Subtracting years without checking whether the birthday has passed.\n- Mixing day-month and month-day date formats. Write the month as a word when sharing dates internationally.\n- Using today's date when a form asks for age on a specific cut-off date.\n\nFor eligibility, school entry or legal questions, check the official rule, including how it treats the birthday itself.",
+    "category": "Calculators",
+    "tags": [
+      "age",
+      "dates",
+      "leap year"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-calculate-age-from-date-of-birth.jpg",
+      "alt": "Illustration of a calendar used to work out an age from a date of birth",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Calculate Age From Date of Birth by Hand",
+      "metaDescription": "Calculate age using date of birth by hand: count full years, then months and days, handle leap-day birthdays and month ends, and avoid common date mistakes.",
+      "focusKeyword": "calculate age using date of birth",
+      "secondaryKeywords": [
+        "work out age from dob",
+        "count age from date of birth"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "When is a 29 February birthday in a normal year?",
+        "a": "Rules differ. Some treat 28 February as the birthday and others 1 March. For legal purposes, use the rule that applies where you are. The age calculator on this site uses 28 February."
+      },
+      {
+        "q": "Why do two calculators give different days?",
+        "a": "Months have different lengths, so there is more than one way to count the leftover months and days. The full years should agree; compare how each handles month ends."
+      }
+    ],
+    "relatedTools": [
+      "age-calculator",
+      "chronological-age-calculator",
+      "hours-calculator",
+      "percentage-calculator"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-calculate-percentage-increase",
+    "slug": "how-to-calculate-percentage-increase",
+    "status": "published",
+    "title": "How to Calculate Percentage Increase and Decrease",
+    "excerpt": "One formula covers increases and decreases. The traps are the starting value, stacked changes and percentage points.",
+    "content": "The percentage increase formula is **(new value − old value) ÷ old value × 100**. A negative answer means a decrease. The old value, where you started, always goes underneath.\n\n## Percentage increase, step by step\n\nA price rises from 80 to 100.\n\n1. Subtract the old value from the new one: 100 − 80 = 20.\n2. Divide by the old value: 20 ÷ 80 = 0.25.\n3. Multiply by 100: **25% increase**.\n\n## Percentage decrease\n\nThe price then falls from 100 back to 80.\n\n1. 80 − 100 = −20.\n2. −20 ÷ 100 = −0.2.\n3. That is a **20% decrease**.\n\nThe two moves are the same size in money but different percentages, because they start from different values. This is why a 25% rise is undone by a 20% fall, not a 25% fall.\n\n![The percentage calculator in percentage change mode, with the formula shown under the result](/blog-images/how-to-calculate-percentage-increase-example.jpg \"Seeing your numbers inside the formula makes it easy to check which value was used as the start.\")\n\n## Apply a percentage, or reverse one\n\n| You want | Formula | Example |\n| --- | --- | --- |\n| Value after an increase of p% | old × (1 + p ÷ 100) | 80 plus 25% = 100 |\n| Value after a decrease of p% | old × (1 − p ÷ 100) | 100 minus 20% = 80 |\n| Original before an increase of p% | new ÷ (1 + p ÷ 100) | 100 before a 25% rise = 80 |\n\nTo reverse a change, divide. Subtracting the same percentage from the new value gives the wrong answer.\n\n## Stacked changes\n\nPercentages that happen one after another do not add. A 10% rise followed by another 10% rise is 1.10 × 1.10 = 1.21, or **21%**. The same applies to discounts: the [discount calculator](/discount-calculator/) shows the real total of stacked offers.\n\n## Percentage points are different\n\nIf a rate moves from 4% to 5%, it rose by **1 percentage point**. As a percentage change, (5 − 4) ÷ 4 × 100 = **25%**. Say which one you mean, especially for interest rates and survey results.\n\n## Change or difference?\n\nUse percentage **change** when one value came first. When comparing two values with no obvious starting point, such as two quotes, **percentage difference** divides by their average instead. The [Percentage Calculator](/percentage-calculator/) has both and shows the formula it used.\n\nFor savings, compounding also matters. The [APY calculator](/apy-calculator/) turns an interest rate into a yearly yield.",
+    "category": "Calculators",
+    "tags": [
+      "percentages",
+      "maths",
+      "formulas"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-calculate-percentage-increase.jpg",
+      "alt": "Illustration of a bar chart showing a percentage increase",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "Percentage Increase Formula With Worked Examples",
+      "metaDescription": "Learn the percentage increase formula and the decrease formula with worked examples, reverse a percentage change and avoid the mistakes that skew results.",
+      "focusKeyword": "percentage increase formula",
+      "secondaryKeywords": [
+        "figure percent increase",
+        "calculate decrease percentage",
+        "equation for percentage change"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Can a percentage increase be more than 100%?",
+        "a": "Yes. Going from 20 to 50 is an increase of 150%, because the rise of 30 is one and a half times the starting value."
+      },
+      {
+        "q": "What if the starting value is zero?",
+        "a": "The percentage change is undefined, because the formula would divide by zero. Report the actual change instead."
+      }
+    ],
+    "relatedTools": [
+      "percentage-calculator",
+      "discount-calculator",
+      "gst-calculator",
+      "apy-calculator"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-convert-heic-to-jpg",
+    "slug": "how-to-convert-heic-to-jpg",
+    "status": "published",
+    "title": "How to Convert a HEIC File to JPG on iPhone, Windows and Mac",
+    "excerpt": "What HEIC is, how to stop your iPhone creating it, and the ways to turn photos you already have into JPG.",
+    "content": "HEIC is the file type many iPhones use for photos. It saves space, but some websites, upload forms and older software will not accept it. You can convert a HEIC file to JPG, or have your phone take JPEG photos from now on.\n\n## Stop an iPhone creating HEIC photos\n\nApple's instructions are:\n\n1. Open **Settings**, then tap **Camera**.\n2. Tap **Formats**, then tap **Most Compatible**.\n\nNew photos and videos then use JPEG or H.264. The option appears only on devices that can capture in the newer formats. It does not convert photos you have already taken. Apple also notes that photos may be converted automatically when you share or import them to a device that does not support HEIF.\n\n## Convert on a Mac with Preview\n\n1. Open the photo in **Preview**.\n2. Choose **File > Export**.\n3. In the **Format** menu choose **JPEG** and set the quality.\n4. Name the file, choose where to save it, and click **Save**.\n\nPreview can export several images at once if you open them in one window and select them all in the sidebar.\n\n## Convert on Windows, Android or any browser\n\nWhether Windows can open HEIC photos depends on the codecs installed. Microsoft distributes HEIF and HEVC extensions through the Microsoft Store, and one of them may carry a charge. Converting avoids installing anything:\n\n1. Open the [HEIC to JPG converter](/heic-to-jpg-converter/).\n2. Choose one or more .heic or .heif photos.\n3. Set the JPG quality.\n4. Tick **Keep photo details** if you want the date taken, camera and location to stay in the file.\n5. Download each photo, or all of them as a ZIP.\n\n![The HEIC to JPG converter before files are added, showing its quality and photo detail options](/blog-images/how-to-convert-heic-to-jpg-example.jpg \"Choose the quality and whether to keep photo details before you convert.\")\n\nThe conversion happens in your browser. Outside Safari, a decoder downloads the first time you convert, and large photos can take a few seconds each. Some Live Photo, burst or edited files may not decode; export those as JPG from the Photos app.\n\n## Check location data before sharing\n\nPhotos can record where they were taken. Leave **Keep photo details** off if you do not want to pass that on, and check the converted file's information if privacy matters.\n\n## After converting\n\nA JPG can be larger than the HEIC it came from, because the formats compress differently. If a form has a size limit, follow [how to reduce image size in KB](/blog/reduce-photo-size-in-kb/). Keep your HEIC originals until you have checked the copies.",
+    "category": "Image optimization",
+    "tags": [
+      "heic",
+      "jpg",
+      "iphone photos"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-convert-heic-to-jpg.jpg",
+      "alt": "Illustration of a HEIC photo being converted into a JPG photo",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Convert a HEIC File to JPG: iPhone, PC, Mac",
+      "metaDescription": "Convert a HEIC file to JPG: set an iPhone to capture JPEG, export from Preview on a Mac, or convert existing photos in your browser on Windows and Android.",
+      "focusKeyword": "convert heic file to jpg",
+      "secondaryKeywords": [
+        "heic to jpg windows",
+        "heic to jpg mac"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Can I just rename .heic to .jpg?",
+        "a": "No. Renaming changes the file name, not the data inside. The file has to be converted so it is actually encoded as JPEG."
+      },
+      {
+        "q": "Does changing the iPhone camera setting convert my old photos?",
+        "a": "No. It affects new captures. Photos already saved as HEIC need to be converted or exported."
+      }
+    ],
+    "relatedTools": [
+      "heic-to-jpg-converter",
+      "image-compressor",
+      "image-resizer",
+      "jpg-to-pdf"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-convert-images-to-pdf",
+    "slug": "how-to-convert-images-to-pdf",
+    "status": "published",
+    "title": "How to Convert Images Into a PDF With Pages in the Right Order",
+    "excerpt": "Turn photos and screenshots into one tidy PDF: prepare the images, choose the page setup and keep the file small enough to send.",
+    "content": "To convert an image to PDF, you place each picture on its own page. The conversion takes seconds; most of the work is getting the pictures straight, ordered and a sensible size.\n\n## Prepare the pictures\n\n- **Photograph documents flat and evenly lit.** Shadows and glare cannot be removed later by converting.\n- **Crop the background.** The [crop tool](/free-crop-image-online/) removes the table around a page.\n- **Convert iPhone HEIC photos first.** The JPG to PDF tool does not open HEIC files. See [how to convert HEIC to JPG](/blog/how-to-convert-heic-to-jpg/).\n- **Name files in order** if you plan to sort by name.\n\n## Create the PDF\n\n1. Open [JPG to PDF](/jpg-to-pdf/). It also accepts PNG, WebP and GIF images.\n2. Choose your images, or drag them in.\n3. Set the page order with the arrow buttons, by dragging, or with **Sort by name**.\n4. Under **Page setup**, choose the page size, orientation and margin.\n5. Tick **Make the PDF smaller** if you are using large phone photos.\n6. Press **Convert to PDF**, then **Download**.\n\n![The JPG to PDF tool showing images in page order with page setup options](/blog-images/how-to-convert-images-to-pdf-example.jpg \"Each image becomes one page, in the order shown.\")\n\n## Pick the right page size\n\n| Page size | Use it when |\n| --- | --- |\n| A4 | The document will be printed or filed in most countries |\n| US Letter | It will be printed or filed where Letter paper is standard |\n| Match each image | It will only be viewed on screen and you want no empty space |\n\nA small margin helps if the pages will be printed, because many printers cannot print to the very edge.\n\n## Check the finished file\n\nScroll through every page. Check the order, orientation and that no edge of a document is cut off. Zoom into small text. If you made the PDF smaller, confirm that the text is still readable.\n\nAn animated GIF becomes a single page showing its first frame, so export the frames you need as separate images first.\n\nIf the file is over an upload limit, read [how to reduce PDF file size](/blog/reduce-pdf-file-size/). If you need to add existing PDF documents too, [merge them](/merge-pdf/) after creating the image pages.",
+    "category": "PDF workflows",
+    "tags": [
+      "jpg to pdf",
+      "photos",
+      "documents"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-convert-images-to-pdf.jpg",
+      "alt": "Illustration of three photos being arranged into pages of one PDF",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Convert an Image to PDF in the Right Order",
+      "metaDescription": "Convert an image to PDF, or many photos into one file: prepare the pictures, set page order, size, orientation and margins, then check the finished document.",
+      "focusKeyword": "convert image to pdf",
+      "secondaryKeywords": [
+        "pics into pdf",
+        "changing a jpg to a pdf"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Does converting a photo to PDF make its text searchable?",
+        "a": "No. The page still holds a picture. Searchable text needs optical character recognition (OCR), which this conversion does not do."
+      },
+      {
+        "q": "Why is my PDF so large?",
+        "a": "Phone photos are large and each one is placed in the file. Turn on the option to make the PDF smaller, or resize the photos before converting."
+      }
+    ],
+    "relatedTools": [
+      "jpg-to-pdf",
+      "heic-to-jpg-converter",
+      "free-crop-image-online",
+      "compress-pdf"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-count-words-in-an-essay",
+    "slug": "how-to-count-words-in-an-essay",
+    "status": "published",
+    "title": "How to Count the Words in an Essay and Meet the Limit",
+    "excerpt": "Getting a number is easy. Knowing which words your marker counts is what keeps you inside the limit.",
+    "content": "To count the words in my essay correctly, I need two things: a counter, and the rule for what is included. The second matters more.\n\n## Find the rule first\n\nCheck the assignment brief or ask. Common questions:\n\n- Do the title, headings and subheadings count?\n- Are in-text citations included?\n- Is the reference list or bibliography excluded?\n- What about footnotes, captions, tables and appendices?\n- Is there a tolerance, or is the limit strict?\n\nWrite the answers down before you edit.\n\n## Count only the parts that count\n\n1. Copy the body text, leaving out the excluded sections.\n2. Paste it into the [Word Counter](/word-counter/). It counts words, characters, sentences and paragraphs as you type, and the text stays in your browser.\n3. Note the total, then check any section limits separately.\n\n![The word counter showing totals for words, characters, sentences and paragraphs](/blog-images/how-to-count-words-in-an-essay-example.jpg \"Count the sections your rule includes, not the whole document by default.\")\n\n## Why two counters disagree\n\nPrograms make different decisions about hyphenated terms, numbers, symbols, web addresses and dashes without spaces. Small differences are normal. If your institution names a tool or checks submissions in a particular program, treat that count as the one that matters and leave a small margin.\n\nText copied from a PDF can also arrive with words split across lines. Check for broken words before counting.\n\n## Pages are only an estimate\n\nIn a common 12-point font with standard margins, 1,000 words is roughly two single-spaced pages or four double-spaced pages. A different font, spacing, headings, quotations and images change the page count considerably.\n\n## If you are over the limit\n\n- Remove points that repeat what you already showed.\n- Cut openings such as \"It is important to note that\".\n- Replace long phrases with one word.\n- Shorten quotations to the words you actually analyze.\n- Do not move essential argument into footnotes or appendices to avoid the count; that may break the rules.\n\n## If you are under\n\nLook for a claim without evidence, an example you did not explain, or a counter-argument you skipped. Adding filler is easy to spot and weakens the essay.\n\nFor platforms that limit **characters** instead of words, use the [Character Counter](/character-counter/). To estimate a spoken presentation, the [reading time calculator](/reading-time-calculator/) converts words into minutes.",
+    "category": "Writing",
+    "tags": [
+      "word count",
+      "essays",
+      "writing"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-count-words-in-an-essay.jpg",
+      "alt": "Illustration of an essay page with its word count",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Count the Words in My Essay Correctly",
+      "metaDescription": "How do I count the words in my essay? Check which parts count, why word counters disagree, how pages relate to words and how to trim or expand fairly.",
+      "focusKeyword": "count the words in my essay",
+      "secondaryKeywords": [
+        "essay word counter",
+        "count number of words"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Do references count toward the word limit?",
+        "a": "It depends on the assignment. Many courses exclude the reference list but some include in-text citations. Your instructions decide."
+      },
+      {
+        "q": "How many pages is 1,000 words?",
+        "a": "As a rough guide, two pages single-spaced or four double-spaced in a common 12-point font. Margins, font and headings change this, so count words, not pages."
+      }
+    ],
+    "relatedTools": [
+      "word-counter",
+      "character-counter",
+      "reading-time-calculator",
+      "add-remove-line-breaks"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-create-a-qr-code-for-a-website",
+    "slug": "how-to-create-a-qr-code-for-a-website",
+    "status": "published",
+    "title": "How to Create a QR Code for a Website That Scans Reliably",
+    "excerpt": "Creating the code takes a minute. Choosing a link that will last, sizing it for print and testing it are what keep it working.",
+    "content": "A QR code for a website is a link drawn as a pattern. Phones read the pattern and offer to open the address. Making one is quick. The mistakes that matter happen after it is printed.\n\n## Choose the link first\n\n- **Use an address you control.** If you might change the destination later, create a page or redirect on your own domain and encode that.\n- **Keep it short.** Longer addresses create denser codes that are harder to scan when small.\n- **Use HTTPS** and open the link on mobile data to check it works outside your own network.\n- **Add campaign parameters now** if you want visits to appear separately in your analytics. They cannot be added to a printed static code.\n\n## Static or dynamic\n\nA **static** code contains your address. Nothing sits in the middle. A **dynamic** code contains a provider's redirect address, which lets you change the destination and count scans, but depends on that provider continuing to run the redirect. Choose with that dependency in mind.\n\n## Create the code\n\n1. Open the [QR Code Generator](/qr-code-generator/). Its codes are static.\n2. Choose **URL** and enter the address.\n3. Keep dark modules on a light background.\n4. Download **SVG** for print, or **PNG** for screens and documents.\n\n![The QR code generator with a website address entered and the code previewed](/blog-images/how-to-create-a-qr-code-for-a-website-example.jpg \"The preview updates as you type. Scan it before downloading.\")\n\n## Add a logo carefully\n\nA logo covers part of the pattern, so the code relies on error correction to recover it. The generator switches to the highest level, **H**, when you add a logo and limits how large it can be. A small, simple logo leaves more spare capacity for glare, scratches and imperfect printing.\n\n## Size and spacing for print\n\n- Keep a blank margin four modules wide around the code. The generator includes it; do not let a design crop it.\n- For close scanning, such as a business card, start at about 2 × 2 cm.\n- For signs, a common rule of thumb is a width of about one tenth of the scanning distance.\n\nThese are starting points, not guarantees. Curved surfaces, glossy paper and poor light all make scanning harder.\n\n## Test before you print the whole run\n\n1. Print one copy at the final size on the final material.\n2. Scan it with more than one phone, including an older one if you can.\n3. Stand where people will stand.\n4. Confirm the page that opens is correct and readable on a phone.\n\nWrite next to the code what it opens, for example \"Scan to see the menu\", and print the short address underneath for people who cannot or prefer not to scan. If you later move the page, set up a [permanent redirect](/blog/301-vs-302-redirects/) so printed codes keep working.",
+    "category": "QR codes",
+    "tags": [
+      "qr code",
+      "print",
+      "links"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-create-a-qr-code-for-a-website.jpg",
+      "alt": "Illustration of a website address being turned into a QR code",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Make a QR Code for a Website That Scans Well",
+      "metaDescription": "Make a QR code for a website that keeps working: choose the right link, static or dynamic code, safe colors, print size and logo settings, then test it.",
+      "focusKeyword": "qr code for website",
+      "secondaryKeywords": [
+        "turn a link into a qr code",
+        "create a qr code for a url"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Does a static QR code expire?",
+        "a": "The image itself has no expiry, because the address is stored inside it. It stops being useful if the page it points to is removed or moved without a redirect."
+      },
+      {
+        "q": "Can I change where a printed code goes?",
+        "a": "Not for a static code. If you point it at a page on your own site, you can later change that page or redirect it."
+      }
+    ],
+    "relatedTools": [
+      "qr-code-generator",
+      "barcode-generator",
+      "review-link-generator",
+      "url-slug-generator"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-fix-invalid-json",
+    "slug": "how-to-fix-invalid-json",
+    "status": "published",
+    "title": "How to Format, Validate and Fix Invalid JSON",
+    "excerpt": "What the usual JSON errors look like, how to read an error position, and why valid JSON can still be the wrong data.",
+    "content": "A JSON formatter and validator does two jobs. Validation tells you whether the text follows the JSON rules. Formatting adds indentation so you can read the structure. Most \"broken JSON\" problems come from a handful of habits borrowed from JavaScript.\n\n## The common errors\n\n| Mistake | Invalid | Valid |\n| --- | --- | --- |\n| Trailing comma | `{\"a\": 1,}` | `{\"a\": 1}` |\n| Single quotes | `{'a': 'x'}` | `{\"a\": \"x\"}` |\n| Unquoted key | `{a: 1}` | `{\"a\": 1}` |\n| Comment | `{\"a\": 1 // note}` | `{\"a\": 1}` |\n| Python or JavaScript values | `True`, `None`, `undefined`, `NaN` | `true`, `null` |\n\nStrings must use double quotes. Inside a string, escape a double quote as `\\\"` and a backslash as `\\\\`. Line breaks must be written as `\\n`.\n\n## Read the error position\n\nAn error points to where the parser **noticed** the problem, which can be just after the real cause. If the message points at a closing bracket, look at the character before it, often an extra comma. If it points at the start of a new line, check whether the previous line is missing a comma.\n\n## Check it step by step\n\n1. Open the [JSON Viewer](/json-viewer/). Your data stays in the browser.\n2. Paste the JSON or open a .json file.\n3. If it is invalid, note the line and column and press **Go to error**.\n4. Fix one problem at a time. A new error may appear further down.\n5. When it is valid, use the formatted or tree view to inspect the structure.\n\n![The JSON viewer reporting the line and column of a syntax error](/blog-images/how-to-fix-invalid-json-example.jpg \"The viewer marks the position and explains what it expected.\")\n\n## Check the text really is JSON\n\n- A response starting with `<` is probably an HTML error page. Check the request and status code.\n- One JSON object per line is the JSON Lines format, not a single JSON document.\n- Text wrapped in extra quotes with many backslashes may be JSON encoded twice.\n- An empty response is not valid JSON.\n\n## Valid is not the same as correct\n\nSyntax validation cannot tell you that a required field is missing, a number should be a string or a date is wrong. Check the structure against your API's documentation or a JSON Schema. Also watch for duplicate keys: parsers may keep only one value without telling you. The JSON Viewer warns about them.\n\nBefore pasting data into any online tool, remove passwords, tokens and personal information, or confirm the tool processes it locally.",
+    "category": "Developer tools",
+    "tags": [
+      "json",
+      "debugging",
+      "developers"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-fix-invalid-json.jpg",
+      "alt": "Illustration of a JSON document with a highlighted syntax error",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "JSON Formatter and Validator: How to Fix Errors",
+      "metaDescription": "Use a JSON formatter and validator to find syntax errors, then fix trailing commas, wrong quotes, comments and other common mistakes with clear examples.",
+      "focusKeyword": "json formatter and validator",
+      "secondaryKeywords": [
+        "online json validator and formatter"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Are comments allowed in JSON?",
+        "a": "No. Standard JSON has no comments. Some configuration formats that look like JSON allow them, so check what your program expects."
+      },
+      {
+        "q": "Why does a large ID number change after formatting?",
+        "a": "Many JavaScript-based tools round integers above 2^53. Store such identifiers as strings, or use a tool that keeps the digits as written."
+      }
+    ],
+    "relatedTools": [
+      "json-viewer",
+      "base64-encoder-decoder",
+      "regex-tester",
+      "unix-timestamp-converter"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-how-to-merge-pdf-files-on-phone",
+    "slug": "how-to-merge-pdf-files-on-phone",
+    "status": "published",
+    "title": "How to Merge PDF Files on an iPhone or Android Phone",
+    "excerpt": "Combine several PDFs from your phone in the browser: where to find the files, how to set the order and what to check before you share the result.",
+    "content": "You can merge PDF on iPhone or Android in the web browser, without installing an app. This guide uses the [Merge PDF](/merge-pdf/) tool, which joins the files on your phone instead of uploading them. Button names in your phone's own file picker vary between phones and software versions.\n\n## Put the files where your browser can find them\n\nPDFs that arrive in email or chat apps are not always saved as files you can pick. Save each one first:\n\n1. Open the PDF.\n2. Use the app's share or download option.\n3. Save it to a folder you can find again, such as the Files app on iPhone or the Downloads folder on Android.\n\nGive the files clear names. Names such as \"1-form\", \"2-id\" and \"3-certificate\" make the order easy to check.\n\n## Merge the files\n\n1. Open [Merge PDF](/merge-pdf/) in your browser.\n2. Tap **Choose PDFs** and select the files. You can add more afterwards.\n3. Use the up and down arrows to set the order. The file at the top comes first.\n4. To include only some pages from a file, type them in that file's box, for example `1-3, 5`.\n5. Change the output file name if you want to, then tap **Merge PDFs** and **Download**.\n\n![The Merge PDF tool on a phone-sized screen with files listed in order](/blog-images/how-to-merge-pdf-files-on-phone-example.jpg \"Check the order in the list before merging. The top file becomes the first pages.\")\n\n## Open and check the combined file\n\nFind the download in your browser's downloads list or your phone's files app, and open it before sending.\n\n- Is the page count what you expected?\n- Are the documents in the right order and the right way up?\n- Are signatures and small print still visible?\n\nIf a page is sideways, fix it with [Rotate PDF](/rotate-pdf/).\n\n## What merging changes\n\nMerging copies pages into a new document. Bookmarks are not carried over with this tool, and fillable form fields may stop being fillable. Fill in and save forms before you merge them. A digital signature on one of the source files should not be expected to remain valid in the new document.\n\n## If something goes wrong\n\n- **A file is missing from the picker:** it may still be inside the email or chat app. Save it as a file first.\n- **The phone is slow or the page reloads:** large scans need memory. Close other apps and merge in smaller groups.\n- **The result is too big to upload:** merge first, then follow [how to reduce PDF file size](/blog/reduce-pdf-file-size/).\n- **Your documents are photos:** turn them into a PDF first with the steps in [how to convert images into a PDF](/blog/how-to-convert-images-to-pdf/).",
+    "category": "PDF workflows",
+    "tags": [
+      "merge pdf",
+      "iphone",
+      "android"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/how-to-merge-pdf-files-on-phone.jpg",
+      "alt": "Illustration of two PDF documents combining into one on a phone",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Merge PDF on iPhone or Android in a Browser",
+      "metaDescription": "Merge PDF on iPhone or Android without installing an app: collect your files, put them in order in a browser tool, then check and save the combined document.",
+      "focusKeyword": "merge pdf on iphone",
+      "secondaryKeywords": [
+        "combine pdfs on iphone",
+        "combine pdf android",
+        "merge pdf iphone"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Can I merge a password-protected PDF?",
+        "a": "Not while it needs a password to open. If you are allowed to, save an unprotected copy first, then merge that copy."
+      },
+      {
+        "q": "Are my documents uploaded when I merge them?",
+        "a": "With the Merge PDF tool on this site, no. The files are joined inside your phone's browser."
+      }
+    ],
+    "relatedTools": [
+      "merge-pdf",
+      "compress-pdf",
+      "split-pdf",
+      "jpg-to-pdf"
+    ],
+    "datePublished": "2026-11-26T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-11-26T00:00:00.000Z"
+  },
+  {
+    "id": "article-jpg-vs-png-vs-webp",
+    "slug": "jpg-vs-png-vs-webp",
+    "status": "published",
+    "title": "JPG vs PNG vs WebP: Which Image Format Should You Use?",
+    "excerpt": "Pick an image format by what is in the picture and where it will be used, and know what you lose when you convert.",
+    "content": "Choosing a JPG, PNG or WebP format comes down to two questions: what is in the picture, and what will open it.\n\n## The short answer\n\n![Comparison table of JPG, PNG and WebP: compression type, transparency, animation and best use](/blog-images/jpg-vs-png-vs-webp-example.jpg \"What each format supports and where it fits.\")\n\n| | JPG | PNG | WebP |\n| --- | --- | --- | --- |\n| Compression | Lossy | Lossless | Lossy or lossless |\n| Transparency | No | Yes | Yes |\n| Animation | No | Not in standard PNG | Yes |\n| Typical use | Photographs | Logos, screenshots, line art | Web pages |\n\n## When JPG is the right choice\n\nJPG removes detail that is hard to notice in photographs, so photo files become much smaller. It is accepted almost everywhere, which matters for forms and email. It is a poor choice for sharp text and flat colors, where it leaves visible smudges around edges. It also cannot store transparency.\n\n## When PNG is the right choice\n\nPNG keeps every pixel exactly. Use it for logos, interface screenshots, diagrams and anything that needs a transparent background. The cost is size: a photograph saved as PNG is usually far larger than the same photograph as a good-quality JPG.\n\n## When WebP is the right choice\n\nWebP covers both jobs, with lossy and lossless modes and transparency. It often produces smaller files than the older formats at similar visible quality, but results depend on the image and settings, so compare your own files.\n\n## What happens when you convert\n\n- **PNG to JPG:** transparent areas must be filled with a color. [PNG to JPG](/png-to-jpg-converter/) lets you choose white, black or a custom background.\n- **JPG to PNG:** [JPG to PNG](/jpg-to-png-converter/) stops further loss in later edits, but does not restore detail and usually makes the file bigger.\n- **Anything to a lossy format:** each new lossy save can lose a little more. Convert from the original, not from an earlier copy.\n\nChanging the file extension is not conversion. The data stays in the old format, and some programs will reject the file.\n\n## A quick way to decide\n\n1. Is it a photograph going into a form or email? Use JPG.\n2. Does it need a transparent background? Use PNG, or WebP if the destination accepts it.\n3. Is it text, a screenshot or a logo? Use PNG or lossless WebP.\n4. Is it for your own website? Test WebP and compare size and appearance.\n\nTo make a file smaller without changing format, use the [image compressor](/image-compressor/). For strict upload limits, see [how to reduce image size in KB](/blog/reduce-photo-size-in-kb/).",
+    "category": "Image optimization",
+    "tags": [
+      "image formats",
+      "webp",
+      "png",
+      "jpg"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/jpg-vs-png-vs-webp.jpg",
+      "alt": "Illustration comparing the JPG, PNG and WebP image formats",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "JPG vs PNG vs WebP: Which Format Should You Use?",
+      "metaDescription": "JPG vs PNG vs WebP explained: which format suits photos, logos and screenshots, what happens to transparency, and when converting one to another helps.",
+      "focusKeyword": "jpg png format",
+      "secondaryKeywords": [
+        "png format to jpeg",
+        "convert png format to jpg",
+        "png to jpg format"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Does converting JPG to PNG improve quality?",
+        "a": "No. Detail removed by JPG compression does not come back. The PNG stores the same pixels, usually in a larger file."
+      },
+      {
+        "q": "Is WebP safe to use?",
+        "a": "Current major browsers display it. Some upload forms and older programs still accept only JPG or PNG, so check the destination."
+      }
+    ],
+    "relatedTools": [
+      "png-to-jpg-converter",
+      "jpg-to-png-converter",
+      "image-compressor",
+      "compress-png-image"
+    ],
+    "datePublished": "2026-10-06T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-10-06T00:00:00.000Z"
+  },
+  {
+    "id": "article-reduce-pdf-file-size",
+    "slug": "reduce-pdf-file-size",
+    "status": "published",
+    "title": "How to Reduce PDF File Size Without Making Text Unreadable",
+    "excerpt": "Why some PDFs are huge, which compression method keeps text selectable, and what to check before you send or upload the smaller copy.",
+    "content": "The safest way to reduce PDF file size depends on what is inside the file. A report exported from a word processor and a stack of scanned pages can look identical on screen, but they need different treatment.\n\n## Find out what kind of PDF you have\n\nOpen the file and try to select a sentence with your cursor.\n\n- **You can select words:** the pages hold real text. The size usually comes from photos or embedded graphics.\n- **You can only drag a box:** each page is an image, typically a scan or phone photo. Page images are the size.\n- **Mixed:** some pages are text and some are scans.\n\n## Choose a method\n\n| Method | Keeps selectable text | Best for | Main risk |\n| --- | --- | --- | --- |\n| Clean up and repack the file | Yes | Text documents and forms | Savings can be small |\n| Recompress the images inside | Yes | Reports with photos | Photos look softer |\n| Turn pages into images | No | Scans with a strict limit | Text can no longer be searched or copied |\n\nTry the methods in that order. Stop at the first one that meets your limit and still reads well.\n\n[Compress PDF](/compress-pdf/) offers these as **Keep text**, **Smallest size** and **Target size**. Target size tries to keep the text first. If it has to convert pages into images to reach your limit, it says so. If even the lowest setting is too large, it reports the smallest result instead of claiming success.\n\n![The PDF compressor set to a target size, with quick limits from 100 KB to 2 MB](/blog-images/reduce-pdf-file-size-example.jpg \"Target size works toward an upload limit and tells you how the result was produced.\")\n\n## Shrink the content before you compress\n\nOften the biggest saving is removing what the recipient does not need.\n\n1. Use [Split PDF](/split-pdf/) to keep only the required pages.\n2. If you can re-scan, choose grayscale for black-and-white paperwork and a moderate resolution.\n3. If you still have the source document, resize oversized pictures there and export again.\n\n## Work to an upload limit\n\nCheck whether the limit applies to one file or to all attachments together. The page count matters: ten scanned pages sharing 200KB get about 20KB each, which is rarely enough for small print. There are presets for [100KB](/compress-pdf-to-100kb/), [200KB](/compress-pdf-to-200kb/) and [1MB](/compress-pdf-to-1mb/).\n\n## Check before you send\n\n- Zoom into the smallest text, stamps, signatures and reference numbers.\n- Check every page, not only the first one.\n- Test links, bookmarks and fillable fields if the document needs them.\n- Keep the original. A converted copy cannot be turned back into it.\n\nA signed or certified PDF can lose its signature validity when it is rewritten. If the signature matters, ask the recipient for another way to send the file instead of compressing it.\n\nIf you are assembling several files first, see [how to merge PDF files on a phone](/blog/how-to-merge-pdf-files-on-phone/) and compress once, after merging.",
+    "category": "PDF workflows",
+    "tags": [
+      "pdf compression",
+      "scanned pdf",
+      "email attachments"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/reduce-pdf-file-size.jpg",
+      "alt": "Illustration of a large PDF document becoming a smaller one with readable lines of text",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Reduce PDF File Size and Keep Text Readable",
+      "metaDescription": "Reduce PDF file size the safe way: find out whether your file is text or scans, pick the right compression method and check small print before you send it.",
+      "focusKeyword": "reduce pdf file size",
+      "secondaryKeywords": [
+        "pdf size reducer",
+        "compress pdf size",
+        "reduce pdf size online"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Why did my PDF get bigger after compressing?",
+        "a": "A text PDF stores letters compactly. Turning its pages into pictures adds far more data than it removes. Use a method that keeps the text instead."
+      },
+      {
+        "q": "Can compression make a scanned PDF searchable?",
+        "a": "No. Searchable text in a scan comes from optical character recognition (OCR), which compression does not perform."
+      }
+    ],
+    "relatedTools": [
+      "compress-pdf",
+      "compress-pdf-to-200kb",
+      "compress-pdf-to-1mb",
+      "split-pdf"
+    ],
+    "datePublished": "2026-10-06T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-10-06T00:00:00.000Z"
+  },
+  {
+    "id": "article-reduce-photo-size-in-kb",
+    "slug": "reduce-photo-size-in-kb",
+    "status": "published",
+    "title": "How to Reduce Image Size in KB for Online Application Forms",
+    "excerpt": "A form rejects your photo for being too large. Check which limit it means, then crop, resize and compress in the order that keeps the picture clear.",
+    "content": "To reduce image size in KB without ruining the photo, work in this order: read the form's rules, crop, set the pixel dimensions, then compress to the byte limit. Compressing first and resizing later usually wastes quality.\n\n## Read the form's limits before you edit\n\nUpload forms often set up to four separate rules. Meeting one does not meet the others.\n\n| Rule | Example | What changes it |\n| --- | --- | --- |\n| File size | Under 50 KB, or between 20 and 50 KB | Compression and pixel dimensions |\n| Pixel dimensions | 200 × 230 pixels | Cropping and resizing |\n| Print size | 3.5 × 4.5 cm at 200 DPI | Converted into pixels |\n| Format | JPG only | Saving in another format |\n\nIf the form gives centimeters and DPI, the pixel size is **centimeters ÷ 2.54 × DPI**. At 200 DPI, 3.5 cm is about 276 pixels and 4.5 cm is about 354 pixels.\n\n## Crop before you compress\n\nA phone photo contains millions of pixels, and most of them are background in an ID-style picture. Cropping to the face or the document removes data you do not need, so more of the byte budget goes to the part that will be checked. Use the [crop tool](/free-crop-image-online/) and keep any margin the form's photo rules require.\n\n## Compress to the target\n\nOpen [Reduce Image Size in KB](/reduce-image-size-in-kb/), type the limit, and add your image. It searches for the highest quality that fits and lowers the dimensions only if quality alone is not enough. The result row shows the exact byte count and the new dimensions.\n\n![A photo compressed to a 50 KB target, showing the output size and dimensions](/blog-images/reduce-photo-size-in-kb-example.jpg \"The result row reports the real output size, so you can check it against the form's limit.\")\n\nWhen the form also fixes the width and height, use [Photo Resizer in KB](/photo-resizer-in-kb/), which sets pixels and a KB range in one step. For the most common single limits there are ready presets for [20KB](/compress-image-to-20kb/) and [50KB](/compress-image-to-50kb/).\n\n## Handle a minimum size as well\n\nSome forms reject files that are too **small**, for example \"between 20 and 50 KB\". A very plain image can compress below the minimum. Start again from the original, allow a higher quality, or use the required pixel dimensions if you had made the picture smaller than the form asked for. Do not enlarge a tiny image just to add bytes; it will not look sharper.\n\n## Check the result before uploading\n\n- Open the downloaded file and zoom to 100%.\n- Names, numbers and signatures must be readable.\n- Confirm the byte size, dimensions and format against the form.\n- Keep the original. Each new compression of a JPG can lose a little more detail, so edit from the original every time.\n\nIf the limit cannot be reached while the photo stays readable, a smaller file is not the answer. Check whether the form accepts another format or a larger size. For choosing between formats, see [JPG vs PNG vs WebP](/blog/jpg-vs-png-vs-webp/).",
+    "category": "Image optimization",
+    "tags": [
+      "photo size",
+      "online forms",
+      "image compression"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/reduce-photo-size-in-kb.jpg",
+      "alt": "Illustration of a large photo being compressed to fit under a file size limit",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "How to Reduce Image Size in KB for Online Forms",
+      "metaDescription": "Reduce image size in KB for an application form: check the pixel and byte limits, crop first, compress to the target and confirm the photo is still clear.",
+      "focusKeyword": "reduce image size in kb",
+      "secondaryKeywords": [
+        "reduce photo size online",
+        "decrease image size in kb",
+        "change image size kb"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Is 50KB equal to 50,000 or 51,200 bytes?",
+        "a": "It depends on the website. Some count 1KB as 1,000 bytes and others as 1,024. A file under 50,000 bytes passes under both."
+      },
+      {
+        "q": "Why does my photo look blurry after compressing?",
+        "a": "The limit was too small for the pixel dimensions, so detail was thrown away. Crop to the part you need and use the pixel size the form asks for, so fewer pixels share the same bytes."
+      }
+    ],
+    "relatedTools": [
+      "reduce-image-size-in-kb",
+      "photo-resizer-in-kb",
+      "free-crop-image-online",
+      "compress-image-to-50kb"
+    ],
+    "datePublished": "2026-10-06T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-10-06T00:00:00.000Z"
+  },
+  {
+    "id": "article-robots-txt-guide",
+    "slug": "robots-txt-guide",
+    "status": "published",
+    "title": "How to Create a robots.txt File Without Blocking Your Site",
+    "excerpt": "Write a small robots.txt file, test it before it goes live, and use noindex when the goal is to keep a page out of search results.",
+    "content": "Creating a robots.txt file takes a few lines. The risk is that one wrong line can stop search engines crawling your whole site. This guide keeps the file small and tests it first.\n\n## What robots.txt does\n\nIt asks crawlers which addresses they may request. It is public, and it is not access control: anyone can read it, and some bots ignore it. Never use it to protect private information.\n\n## Where it goes\n\nThe file must be at the root of the host, such as `https://example.com/robots.txt`. Each subdomain and protocol has its own. Google states it reads up to 500 KiB and ignores content after that.\n\n## A sensible starting file\n\n`User-agent: *` applies rules to all crawlers that have no more specific group.\n\n```\nUser-agent: *\nDisallow: /admin/\nDisallow: /cart/\n\nSitemap: https://example.com/sitemap.xml\n```\n\nReplace the paths with your own. An empty `Disallow:` blocks nothing. `Disallow: /` blocks everything, which is a common accident when a staging file is copied to a live site.\n\n## Build and test it\n\n1. Create the rules with the [robots.txt generator](/robots-txt-generator/).\n2. Send them to the [robots.txt tester](/robots-txt-tester/).\n3. Test important pages, one page that should be blocked, and CSS and JavaScript files.\n4. Upload the file, then fetch the live version and check it again.\n\n![The robots.txt generator showing allow and disallow rules and the resulting file](/blog-images/robots-txt-guide-example.jpg \"Review the generated file before uploading it to your domain's root.\")\n\nDo not block the CSS or JavaScript a page needs to render.\n\n## noindex is not the same as Disallow\n\n| Goal | Use |\n| --- | --- |\n| Reduce crawling of unimportant URLs | robots.txt Disallow |\n| Keep a public page out of search results | `noindex` meta tag or `X-Robots-Tag` header |\n| Keep content private | A login or password |\n| Remove a deleted page | A 404 or 410 response |\n\nFor `noindex` to work, the crawler must be able to fetch the page and see it. If robots.txt blocks the page, Google cannot read the instruction. To remove an indexed page, allow crawling, add `noindex`, and wait for it to be recrawled.\n\n## AI crawlers\n\nSome AI services publish their own user-agent names, so you can write separate rules for them. Check each provider's current documentation, because names and purposes change. Blocking one crawler does not block the others.\n\n## After publishing\n\n- Confirm the file returns 200 at the root.\n- Watch the robots.txt report and indexing report in Search Console.\n- Keep a copy of the previous version so you can restore it.\n\nIf URLs are moving rather than being hidden, use redirects. See [301 vs 302 redirects](/blog/301-vs-302-redirects/).",
+    "category": "Technical SEO",
+    "tags": [
+      "robots.txt",
+      "crawling",
+      "noindex"
+    ],
+    "authorName": "",
+    "authorUrl": "",
+    "featuredImage": {
+      "src": "/blog-images/robots-txt-guide.jpg",
+      "alt": "Illustration of a robots.txt file with allow and disallow rules",
+      "width": 1200,
+      "height": 630
+    },
+    "seo": {
+      "metaTitle": "Creating a robots.txt File: A Safe Step-by-Step Guide",
+      "metaDescription": "Creating a robots.txt file: write the rules, add your sitemap, test URLs before publishing and learn why robots.txt cannot remove a page from Google.",
+      "focusKeyword": "creating a robots txt",
+      "secondaryKeywords": [
+        "robots txt file generator",
+        "create robots file"
+      ],
+      "canonicalUrl": "",
+      "noindex": false,
+      "nofollow": false,
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": null,
+      "twitterTitle": "",
+      "twitterDescription": "",
+      "schemaType": "BlogPosting"
+    },
+    "faqs": [
+      {
+        "q": "Does Disallow remove a page from Google?",
+        "a": "No. It limits crawling. A blocked address can still appear in results if other pages link to it. Use noindex or require a password."
+      },
+      {
+        "q": "Do small websites need crawl budget tuning?",
+        "a": "Usually not. Google's crawl budget guidance is aimed at very large or rapidly changing sites. Fix errors and duplicate URL traps before writing special rules."
+      }
+    ],
+    "relatedTools": [
+      "robots-txt-generator",
+      "robots-txt-tester",
+      "xml-sitemap-generator",
+      "http-status-checker"
+    ],
+    "datePublished": "2026-10-06T00:00:00.000Z",
+    "dateModified": "2026-11-26T00:00:00.000Z",
+    "createdAt": "2026-10-06T00:00:00.000Z"
+  }
+]

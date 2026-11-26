@@ -7,6 +7,7 @@ import path from "node:path";
 import { CATEGORIES } from "../src/content/categories";
 import { TOOLS } from "../src/content/tools";
 import migration from "../src/seo/migration.json";
+import seedPosts from "../src/content/seed-posts.json";
 
 const errors: string[] = [];
 const warnings: string[] = [];
@@ -37,7 +38,7 @@ const BANNED = [
 
 const redirects = migration.redirects as Record<string, string>;
 const gone = new Set(migration.gone as string[]);
-const livePaths = new Set<string>(["/", "/tools/", "/blog/", ...CATEGORIES.map((c) => c.path), ...TOOLS.map((t) => t.path)]);
+const livePaths = new Set<string>(["/", "/tools/", "/blog/", ...seedPosts.map((p) => `/blog/${p.slug}/`), ...CATEGORIES.map((c) => c.path), ...TOOLS.map((t) => t.path)]);
 ["/about-us/", "/contact/", "/faq/", "/privacy-policy/", "/terms-and-conditions/", "/write-for-us/", "/tool-complain/"].forEach((p) => livePaths.add(p));
 
 const seen = { id: new Map<string, string>(), path: new Map<string, string>(), title: new Map<string, string>(), desc: new Map<string, string>(), h1: new Map<string, string>() };

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { BLOG_DESCRIPTION, BLOG_TITLE, BlogIndexView, blogPagePath } from "@/components/blog/BlogIndexView";
+import { BLOG_DESCRIPTION, BLOG_TITLE, BlogIndexView, blogPage, blogPagePath } from "@/components/blog/BlogIndexView";
 import { buildMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -19,5 +19,7 @@ export default async function BlogPaged({ params }: { params: Promise<{ n: strin
   const n = pageNum((await params).n);
   if (n === 1) permanentRedirect("/blog/");
   if (!(n > 1)) notFound();
+  // A page number that no longer exists (the list got shorter) leads back to the blog, not to a 404.
+  if (n > (await blogPage(n)).pages) permanentRedirect("/blog/");
   return <BlogIndexView page={n} />;
 }

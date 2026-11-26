@@ -20,10 +20,28 @@ function optedOut(): boolean {
   return nav.globalPrivacyControl === true || nav.doNotTrack === "1";
 }
 
+// Only controlled operational dimensions may leave the browser. Unknown keys are dropped,
+// including filenames, URLs, query text, calculation inputs and generated output.
+const EVENT_KEYS = new Set([
+  "tool_id", "input_method", "action", "error_code", "stage", "surface", "position",
+  "results_count", "query_length", "trigger", "reason", "mode", "reached", "files",
+  "format", "to", "level", "size", "target_kb", "pages", "images", "count",
+]);
+
+export function analyticsParams(params: Params): Params {
+  const clean: Params = {};
+  for (const [k, v] of Object.entries(params)) {
+    if (!EVENT_KEYS.has(k) || v === undefined) continue;
+    if (typeof v === "number" && !Number.isFinite(v)) continue;
+    if (typeof v === "string" && (v.length > 80 || /https?:|@|[\r\n]/i.test(v))) continue;
+    clean[k] = v;
+  }
+  return clean;
+}
+
 export function track(event: string, params: Params = {}): void {
   if (typeof window === "undefined" || !process.env.NEXT_PUBLIC_GA_ID || optedOut()) return;
-  const clean: Params = {};
-  for (const [k, v] of Object.entries(params)) if (v !== undefined) clean[k] = v;
+  const clean = analyticsParams(params);
   if (window.gtag) window.gtag("event", event, clean);
   else {
     const queue = (window.__pssQueue ||= []);

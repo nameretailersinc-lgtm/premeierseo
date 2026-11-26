@@ -150,13 +150,11 @@ export const IMAGE_TOOLS: ToolDef[] = [
     config: { mode: "photo" },
     aliases: [
       "passport photo resizer",
-      "photo resizer",
       "resize photo in kb and pixels",
       "resize image in cm and kb",
       "signature resizer",
       "exam photo resizer",
       "resize photo to 200x230",
-      "photo size reducer",
       "resize photo kb",
     ],
     keywords: ["exam form", "job portal", "signature", "dpi", "passport size"],
@@ -1679,10 +1677,10 @@ export const IMAGE_TOOLS: ToolDef[] = [
     ],
     related: ["heic-to-png-converter", "compress-jpg-image", "reduce-image-size-in-kb", "image-resizer", "compress-image-to-1mb"],
     links: [
+      { href: "/blog/how-to-convert-heic-to-jpg/", anchor: "HEIC to JPG on each device" },
       { href: "/heic-to-png-converter/", anchor: "HEIC to PNG" },
       { href: "/jpg-to-pdf/", anchor: "JPG to PDF" },
       { href: "/compress-jpg-image/", anchor: "compress JPG" },
-      { href: "/blog/open-heic-files-windows/", anchor: "how to open HEIC files on Windows" },
     ],
     features: [
       "Bulk HEIC/HEIF to JPG conversion",

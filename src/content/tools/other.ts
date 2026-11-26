@@ -16,9 +16,9 @@ export const OTHER_TOOLS: ToolDef[] = [
     path: "/qr-code-generator/",
     name: "QR Code Generator",
     h1: "QR Code Generator",
-    title: "QR Code Generator – URL, Wi-Fi and Text QR Codes",
+    title: "QR Code Generator – Create Free QR Codes Online",
     metaDescription:
-      "Create static QR codes for links, Wi-Fi, text, email and phone numbers. Set error correction and size, and download a PNG. Static codes never expire.",
+      "Make QR codes for links, text, Wi-Fi and contact details, add your logo and download PNG or SVG. Static codes don't expire. No account needed.",
     summary:
       "Create a QR code for a link, Wi-Fi network, text, email, phone number or contact card, and download it as PNG or SVG. The codes are static, so they work for as long as the content does.",
     category: "other-tools",
@@ -26,17 +26,17 @@ export const OTHER_TOOLS: ToolDef[] = [
     card: "Make QR codes for links, Wi-Fi, contacts and text as PNG or SVG.",
     archetype: "generator",
     widget: "qr-code",
-    aliases: ["qr code maker", "create qr code", "qr generator", "wifi qr code", "qr code for url", "qr code for link", "vcard qr code", "qr code svg", "free qr code", "qr kod"],
+    aliases: ["qr code generator with logo", "custom qr code generator", "free qr code generator no expiration", "static qr code generator", "text to qr code", "link to qr code", "qr code maker", "create qr code", "qr generator", "wifi qr code", "qr code for url", "qr code for link", "vcard qr code", "qr code svg", "free qr code", "qr kod"],
     keywords: ["qr", "wifi", "vcard", "menu", "poster", "link"],
     processing: "browser",
     limits: [
       "Static codes only: the content is stored in the image, so it can't be edited after printing and scans can't be counted.",
-      "No logo overlay. If you add a logo yourself, use error correction H and test the code.",
+      "A logo covers part of the code. Error correction is locked to H and the logo is capped at 22% of the width, but always scan the final code yourself.",
     ],
     steps: [
       "Choose the **QR code type**: **URL**, **Text**, **Wi-Fi**, **Email**, **Phone** or **Contact (vCard)**.",
       "Fill in the fields. The code updates as you type.",
-      "Open **Size, colors and error correction** to set the **Error correction** level, **Image size**, **Quiet zone** and colors.",
+      "Open **Size, colors and error correction** to set the **Error correction** level, **Image size**, **Quiet zone** and colors. Add a **logo** there if you want one.",
       "Scan the preview with your phone, then press **PNG** or **SVG** to download it.",
     ],
     example: {
@@ -56,7 +56,7 @@ export const OTHER_TOOLS: ToolDef[] = [
       },
       {
         heading: "Error correction and logos",
-        body: "QR codes include Reed–Solomon error correction, so part of a code can be dirty, scratched or covered and still scan. The QR standard (ISO/IEC 18004) defines four levels:\n\n| Level | Recovers about |\n|---|---|\n| L | 7% |\n| M | 15% |\n| Q | 25% |\n| H | 30% |\n\nHigher levels make the pattern denser, so use **M** for screens and clean prints, and **Q** or **H** for outdoor signs or if you'll place a small logo over the center. The generator doesn't add logos; if you add one in a design tool, keep it well under the recovery limit and test the result.",
+        body: "QR codes include Reed–Solomon error correction, so part of a code can be dirty, scratched or covered and still scan. The QR standard (ISO/IEC 18004) defines four levels:\n\n| Level | Recovers about |\n|---|---|\n| L | 7% |\n| M | 15% |\n| Q | 25% |\n| H | 30% |\n\nHigher levels make the pattern denser, so use **M** for screens and clean prints, and **Q** or **H** for outdoor signs.\n\n**Adding a logo:** choose a PNG, JPG or WebP in the appearance settings. The generator places it in the center on a plain background plate, away from the three corner squares, switches error correction to **H** and limits its width to 22% of the code. The logo relies on error correction, so it leaves less spare capacity for dirt, glare or scratches. A smaller, simple logo and a short link give the most margin. SVG downloads embed the logo image.",
       },
       {
         heading: "Size and print guidelines",
@@ -91,14 +91,15 @@ export const OTHER_TOOLS: ToolDef[] = [
     ],
     related: ["barcode-generator", "url-opener", "password-generator", "find-facebook-id", "image-resizer"],
     links: [
+      { href: "/blog/how-to-create-a-qr-code-for-a-website/", anchor: "QR codes for websites" },
       { href: "/barcode-generator/", anchor: "barcode generator" },
       { href: "/review-link-generator/", anchor: "Google review QR code" },
       { href: "/url-opener/", anchor: "bulk URL opener" },
     ],
     appCategory: "UtilitiesApplication",
-    features: ["URL, text, Wi-Fi, email, phone and vCard QR codes", "Error correction L, M, Q or H", "PNG and SVG downloads with adjustable size and quiet zone", "Color choice with a contrast warning"],
+    features: ["URL, text, Wi-Fi, email, phone and vCard QR codes", "Optional center logo with error correction locked to H", "Error correction L, M, Q or H", "PNG and SVG downloads with adjustable size and quiet zone", "Color choice with a contrast warning"],
     indexable: true,
-    updated: UPDATED,
+    updated: "2026-11-26",
     priority: 1,
   },
   {

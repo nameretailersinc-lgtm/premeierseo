@@ -80,6 +80,7 @@ const WIDGETS: Record<string, ComponentType<WidgetProps>> = {
   "pdf-rotate": dynamic(() => import("./widgets/pdf-rotate"), { loading: Loading }),
   "pdf-compress": dynamic(() => import("./widgets/pdf-compress"), { loading: Loading }),
   "pdf-to-images": dynamic(() => import("./widgets/pdf-to-images"), { loading: Loading }),
+  "pdf-to-text": dynamic(() => import("./widgets/pdf-to-text"), { loading: Loading }),
   "images-to-pdf": dynamic(() => import("./widgets/images-to-pdf"), { loading: Loading }),
   "word-to-pdf": dynamic(() => import("./widgets/word-to-pdf"), { loading: Loading }),
   "pdf-annotate": dynamic(() => import("./widgets/pdf-annotate"), { loading: Loading }),

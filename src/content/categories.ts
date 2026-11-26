@@ -46,7 +46,7 @@ export const CATEGORIES: CategoryDef[] = [
       },
     ],
     related: ["development-tools", "free-seo-tools", "binary-tools"],
-    guides: ["/blog/how-many-pages-is-1000-words/", "/blog/character-limits-cheat-sheet/"],
+    guides: ["/blog/how-to-count-words-in-an-essay/"],
     updated: "2026-09-30",
   },
   {
@@ -133,7 +133,7 @@ export const CATEGORIES: CategoryDef[] = [
       },
     ],
     related: ["development-tools", "traffic-performance-tools", "text-tools"],
-    guides: ["/blog/write-title-tags-meta-descriptions/", "/blog/301-vs-302-redirects/", "/blog/robots-txt-guide/"],
+    guides: ["/blog/301-vs-302-redirects/", "/blog/robots-txt-guide/"],
     updated: "2026-09-30",
   },
   {
@@ -319,14 +319,14 @@ export const CATEGORIES: CategoryDef[] = [
     h1: "Online Calculators",
     title: "Online Calculators – Percentage, GST, EMI, Age and More",
     metaDescription:
-      "Everyday calculators with the formulas shown: percentage, discount, GST, loan EMI, BMI, age, chronological age, hours worked, AdSense and file sizes.",
+      "Calculators with the formulas shown: percentage, discount, GST, loan EMI, APY, BMI, body fat, age, hours worked, AdSense earnings and file sizes.",
     intro:
       "Calculators for everyday money, health, date and file-size questions. Each one updates as you type and shows the formula it used, so you can check the working. Calculations run in your browser.",
     card: "Work out percentages, GST, EMI, BMI, age and hours, with formulas.",
     icon: "calculator",
     groups: [
       { id: "money", heading: "Money and shopping", description: "Work out discounts, tax and percentages." },
-      { id: "loans", heading: "Loans", description: "Calculate repayments and interest." },
+      { id: "loans", heading: "Loans and savings", description: "Calculate repayments, interest and yield." },
       { id: "health", heading: "Health", description: "Health measures with the formula shown." },
       { id: "dates", heading: "Dates and time", description: "Work out ages, durations and hours." },
       { id: "web", heading: "Websites and file sizes", description: "Calculations for websites, ads and files." },

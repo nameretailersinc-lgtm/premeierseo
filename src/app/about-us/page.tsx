@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { RailCard, StaticPage } from "@/components/StaticPage";
 import { CATEGORIES } from "@/content/categories";
-import { TOOLS } from "@/content/tools";
+import { PUBLIC_TOOLS as TOOLS } from "@/content/tools";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 

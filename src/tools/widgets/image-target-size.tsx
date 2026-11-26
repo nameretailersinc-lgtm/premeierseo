@@ -194,6 +194,7 @@ export default function ImageTargetSize({ toolId, config }: WidgetProps) {
         height: r.height,
         detail: `${formatBytes(row.file.size)} → ${formatKB(blob.size, base)} (${formatInt(blob.size)} bytes) · ${dims(r.width, r.height)}`,
         warn,
+        reached: r.ok && !r.belowMin,
         info: notes.join(" · "),
       };
     } finally {
@@ -203,11 +204,14 @@ export default function ImageTargetSize({ toolId, config }: WidgetProps) {
   };
 
   const batch = useBatch(processor, (rows) => {
-    const ok = rows.filter((r) => r.status === "done").length;
+    const ready = rows.filter((r) => r.status === "done");
+    const ok = ready.filter((r) => r.out?.reached !== false).length;
+    const missed = ready.length - ok;
     const failed = rows.filter((r) => r.status === "error").length;
-    if (ok) completed("compress_target", { files: ok, target_kb: Math.round(target.bytes / 1000) });
+    if (ok) completed("compress_target", { files: ok, target_kb: Math.round(target.bytes / 1000), reached: true });
     if (failed) trackError("DECODE", "process");
-    announce(`${ok} image${ok === 1 ? "" : "s"} ready${failed ? `, ${failed} failed` : ""}`);
+    if (missed) trackError("TARGET_NOT_REACHED", "process");
+    announce(`${ok} image${ok === 1 ? "" : "s"} within target${missed ? `, ${missed} outside target` : ""}${failed ? `, ${failed} failed` : ""}`);
   });
   const [selected, setSelected] = useState<string | null>(null);
 

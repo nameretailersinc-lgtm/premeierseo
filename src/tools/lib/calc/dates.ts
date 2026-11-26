@@ -27,7 +27,10 @@ export function parseISODate(s: string): YMD | null {
 export const toISO = (v: YMD) => `${String(v.y).padStart(4, "0")}-${String(v.m).padStart(2, "0")}-${String(v.d).padStart(2, "0")}`;
 
 export function daysInMonth(y: number, m: number): number {
-  return new Date(Date.UTC(y, m, 0)).getUTCDate();
+  // setUTCFullYear, not Date.UTC: the latter reads years 0–99 as 1900–1999.
+  const t = new Date(0);
+  t.setUTCFullYear(y, m, 0);
+  return t.getUTCDate();
 }
 
 export const isLeap = (y: number) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
@@ -120,7 +123,8 @@ export function nextBirthday(birth: YMD, today: YMD) {
 
 export const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 export function weekday(v: YMD): string {
-  return WEEKDAYS[new Date(Date.UTC(v.y, v.m - 1, v.d)).getUTCDay()];
+  // 1970-01-01 (day 0) was a Thursday.
+  return WEEKDAYS[(((dayNumber(v) + 4) % 7) + 7) % 7];
 }
 
 export function totals(from: YMD, to: YMD) {

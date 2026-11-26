@@ -35,6 +35,8 @@ type FormatChoice = "same" | "jpeg" | "png" | "webp";
 
 const PRESETS = [
   { label: "Square post 1080 × 1080", w: 1080, h: 1080 },
+  { label: "Square 600 × 600", w: 600, h: 600 },
+  { label: "Square 300 × 300", w: 300, h: 300 },
   { label: "Portrait post 1080 × 1350", w: 1080, h: 1350 },
   { label: "Story / Reel 1080 × 1920", w: 1080, h: 1920 },
   { label: "YouTube thumbnail 1280 × 720", w: 1280, h: 720 },
@@ -42,14 +44,14 @@ const PRESETS = [
   { label: "Full HD 1920 × 1080", w: 1920, h: 1080 },
 ];
 
-export default function ImageResize({ toolId }: WidgetProps) {
+export default function ImageResize({ toolId, config }: WidgetProps) {
   const id = useId();
   const { completed, announce } = useTool();
   const [o, setO] = usePersistentOptions(toolId, {
     mode: "pixels" as Mode,
-    width: 1080 as number | null,
-    height: null as number | null,
-    lock: true,
+    width: Number(config?.width) || 1080 as number | null,
+    height: (Number(config?.height) || null) as number | null,
+    lock: !config?.height,
     percent: 50,
     longest: 1600 as number | null,
     fit: "crop" as Fit,

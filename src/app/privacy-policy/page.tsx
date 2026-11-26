@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { RailCard, StaticPage, TocCard } from "@/components/StaticPage";
-import { TOOLS } from "@/content/tools";
+import { PUBLIC_TOOLS as TOOLS } from "@/content/tools";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 

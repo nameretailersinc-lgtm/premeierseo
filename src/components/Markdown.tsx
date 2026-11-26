@@ -122,7 +122,15 @@ export function Markdown({ text, className, blogLinks = false }: { text: string;
         blocks.push(
           <figure key={key} className="my-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={im[1]} loading="lazy" decoding="async" className="h-auto w-full rounded-xl border border-line" />
+            <img
+              src={src}
+              alt={im[1]}
+              // The bundled article images share one size (scripts/build-blog-images.mjs), so space is reserved before they load.
+              {...(src.startsWith("/blog-images/") ? { width: 1200, height: 750 } : {})}
+              loading="lazy"
+              decoding="async"
+              className="h-auto w-full rounded-xl border border-line"
+            />
             {im[3] && <figcaption className="mt-2 text-center text-sm text-ink-3">{im[3]}</figcaption>}
           </figure>,
         );
@@ -166,7 +174,8 @@ export function Markdown({ text, className, blogLinks = false }: { text: string;
       }
       const [head, ...body] = rows;
       blocks.push(
-        <table key={key}>
+        // Focusable because on narrow screens the table itself scrolls sideways.
+        <table key={key} tabIndex={0}>
           <thead>
             <tr>
               {head.map((c, j) => (

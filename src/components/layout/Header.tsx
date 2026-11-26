@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CATEGORIES } from "@/content/categories";
-import { TOOLS } from "@/content/tools";
+import { PUBLIC_TOOLS as TOOLS } from "@/content/tools";
 import { Icon } from "@/components/Icon";
 import { categoryCounts } from "@/components/cards";
 import { categoryArt } from "@/lib/illustrations";

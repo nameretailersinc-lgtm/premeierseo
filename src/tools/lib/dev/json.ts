@@ -321,7 +321,7 @@ export function toValue(node: JNode): unknown {
     case "arr":
       return node.v.map(toValue);
     case "obj": {
-      const o: Record<string, unknown> = {};
+      const o: Record<string, unknown> = Object.create(null);
       for (const [k, v] of node.e) o[k] = toValue(v);
       return o;
     }

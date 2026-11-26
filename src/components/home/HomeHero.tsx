@@ -4,7 +4,7 @@ import { categoryCounts } from "@/components/cards";
 import { Icon } from "@/components/Icon";
 import { SearchBox } from "@/components/search/SearchBox";
 import { CATEGORY_BY_ID } from "@/content/categories";
-import { TOOLS } from "@/content/tools";
+import { PUBLIC_TOOLS } from "@/content/tools";
 import type { CategoryId } from "@/lib/types";
 
 /*
@@ -36,12 +36,12 @@ const STRIP: { id: CategoryId; title: string; line: string; art?: string }[] = [
 ];
 
 export function HomeHero() {
-  const total = TOOLS.length;
+  const total = PUBLIC_TOOLS.length;
   const counts = categoryCounts();
   /* Card boxes are percentages of the scene image (1012×525), matching where the mockup placed them. */
   const stats = [
-    { href: "/tools/", icon: "trending-up" as const, tone: "text-[#16a34a]", big: `${total}+`, small: "Free tools", box: "top-[10%]" },
-    { href: "/privacy-policy/", icon: "shield-check" as const, tone: "text-[#2563eb]", big: "Private", small: "Runs in browser", box: "top-[31%]" },
+    { href: "/tools/", icon: "trending-up" as const, tone: "text-[#16a34a]", big: `${total}`, small: "Free tools", box: "top-[10%]" },
+    { href: "/privacy-policy/", icon: "shield-check" as const, tone: "text-[#2563eb]", big: "Local", small: "Most tools", box: "top-[31%]" },
     { href: "/tools/", icon: "zap" as const, tone: "text-[#7c3aed]", big: "Instant", small: "No sign-up", box: "top-[52%]" },
   ];
 
@@ -99,12 +99,11 @@ export function HomeHero() {
           </ul>
 
           <h1 className="mt-6 text-[2.25rem] leading-[1.08] font-extrabold tracking-[-0.045em] text-ink sm:text-[3rem] lg:mt-[1.9vw] lg:text-[clamp(2.25rem,3.5vw,3.6rem)] lg:whitespace-nowrap">
-            Free Online Tools for <br />
-            <span className="text-[var(--hue-blue)]">SEO</span>, <span className="text-[var(--hue-purple)]">Text</span>,{" "}
-            <span className="text-[var(--hue-pink)]">Images</span> and <span className="text-[var(--hue-orange)]">PDFs</span>
+            Free Online Tools <br />
+            <span className="text-[var(--hue-blue)]">for Everyday Tasks</span>
           </h1>
           <p className="mt-3 max-w-[42rem] text-base leading-7 text-ink-2 lg:text-[clamp(1rem,1.15vw,1.2rem)] lg:leading-[1.6]">
-            {total}+ free, fast and easy-to-use tools for everyday work. Find the right one, get the job done, and get on with your day.
+            Compress images, convert PDFs, check SEO, count words and calculate with {total} free tools. No registration required.
           </p>
 
           <div className="mt-6 max-w-[42rem] lg:mt-[1.5vw] [&_button[type=submit]]:rounded-full sm:[&_button[type=submit]]:after:ml-2 sm:[&_button[type=submit]]:after:content-['→'] [&_button[type=submit]]:px-6 [&_input[type=search]]:h-[3.15rem] [&_input[type=search]]:rounded-full [&_input[type=search]]:border-line [&_input[type=search]]:pl-14 [&_input[type=search]]:shadow-[0_12px_32px_-12px_rgb(15_30_70/0.25)]">

@@ -109,7 +109,6 @@ export const SEO_TOOLS: ToolDef[] = [
       { href: "/open-graph-checker/", anchor: "Open Graph checker" },
       { href: "/serp-simulator/", anchor: "SERP simulator" },
       { href: "/heading-tag-extractor/", anchor: "heading checker" },
-      { href: "/blog/write-title-tags-meta-descriptions/", anchor: "how to write title tags and meta descriptions" },
     ],
     appCategory: "DeveloperApplication",
     features: [
@@ -319,7 +318,7 @@ export const SEO_TOOLS: ToolDef[] = [
     archetype: "generator",
     widget: "serp-preview",
     config: { mode: "title" },
-    aliases: ["seo title generator", "title tag checker", "page title length checker", "meta title generator", "title generator", "seo title checker", "title length checker", "page title generator"],
+    aliases: ["seo title generator", "page title length checker", "meta title generator", "title generator", "seo title checker", "title length checker", "page title generator"],
     keywords: ["title", "pixel width", "length", "seo title"],
     processing: "browser",
     steps: [
@@ -381,7 +380,6 @@ export const SEO_TOOLS: ToolDef[] = [
       { href: "/meta-description-generator/", anchor: "meta description generator" },
       { href: "/serp-simulator/", anchor: "SERP simulator" },
       { href: "/meta-tags-analyzer/", anchor: "meta tag analyzer" },
-      { href: "/blog/write-title-tags-meta-descriptions/", anchor: "title tag guide" },
     ],
     appCategory: "DeveloperApplication",
     features: [
@@ -412,7 +410,7 @@ export const SEO_TOOLS: ToolDef[] = [
     archetype: "generator",
     widget: "serp-preview",
     config: { mode: "description" },
-    aliases: ["meta description checker", "meta description length", "seo description generator", "meta description length checker", "description generator", "meta desc generator", "snippet generator", "meta description writer"],
+    aliases: ["meta description length", "seo description generator", "meta description length checker", "description generator", "meta desc generator", "snippet generator", "meta description writer"],
     keywords: ["description", "snippet", "pixel", "length"],
     processing: "browser",
     steps: [
@@ -1128,7 +1126,6 @@ export const SEO_TOOLS: ToolDef[] = [
     links: [
       { href: "/canonical-url-generator/", anchor: "canonical tag generator" },
       { href: "/xml-sitemap-generator/", anchor: "XML sitemap generator" },
-      { href: "/blog/hreflang-guide/", anchor: "hreflang implementation guide" },
     ],
     appCategory: "DeveloperApplication",
     features: [
@@ -1217,7 +1214,6 @@ export const SEO_TOOLS: ToolDef[] = [
       { href: "/hreflang-tags-generator/", anchor: "hreflang generator" },
       { href: "/redirect-checker/", anchor: "redirect checker" },
       { href: "/meta-tags-analyzer/", anchor: "check a page's canonical" },
-      { href: "/blog/canonical-tags-explained/", anchor: "canonical tags explained" },
     ],
     appCategory: "DeveloperApplication",
     features: [
@@ -2065,7 +2061,6 @@ export const SEO_TOOLS: ToolDef[] = [
       { href: "/redirect-checker/", anchor: "redirect checker" },
       { href: "/is-it-down/", anchor: "is a site down for everyone?" },
       { href: "/website-uptime-checker/", anchor: "website uptime checker" },
-      { href: "/blog/http-status-codes-seo/", anchor: "HTTP status codes for SEO" },
     ],
     appCategory: "DeveloperApplication",
     features: [

@@ -9,6 +9,7 @@ import { PERFORMANCE_TOOLS } from "./performance";
 import { PDF_TOOLS } from "./pdf";
 import { CALCULATOR_TOOLS } from "./calculators";
 import { OTHER_TOOLS } from "./other";
+import { PRESET_TOOLS } from "./presets";
 
 export const TOOLS: ToolDef[] = [
   ...TEXT_TOOLS,
@@ -21,7 +22,11 @@ export const TOOLS: ToolDef[] = [
   ...PDF_TOOLS,
   ...CALCULATOR_TOOLS,
   ...OTHER_TOOLS,
+  ...PRESET_TOOLS,
 ];
+
+/** Public discovery excludes intentionally unfinished or provider-dependent pages. */
+export const PUBLIC_TOOLS = TOOLS.filter((t) => t.indexable);
 
 const BY_ID = new Map(TOOLS.map((t) => [t.id, t]));
 const BY_PATH = new Map(TOOLS.map((t) => [t.path, t]));
@@ -36,7 +41,7 @@ export function getToolByPath(path: string): ToolDef | undefined {
 
 /** Tools whose primary category is `cat`, in hub order (group order, then priority, then name). */
 export function toolsInCategory(cat: CategoryId, groupOrder?: string[]): ToolDef[] {
-  const list = TOOLS.filter((t) => t.category === cat);
+  const list = PUBLIC_TOOLS.filter((t) => t.category === cat);
   const gi = (g: string) => (groupOrder ? groupOrder.indexOf(g) : 0);
   return list.sort(
     (a, b) =>
@@ -49,7 +54,7 @@ export function toolsInCategory(cat: CategoryId, groupOrder?: string[]): ToolDef
 
 /** Tools cross-listed on `cat` ("Also useful here"). */
 export function alsoInCategory(cat: CategoryId): ToolDef[] {
-  return TOOLS.filter((t) => t.alsoIn?.includes(cat)).sort((a, b) => a.priority - b.priority);
+  return PUBLIC_TOOLS.filter((t) => t.alsoIn?.includes(cat)).sort((a, b) => a.priority - b.priority);
 }
 
 /** Related tools for a tool page: curated list first, then same-group and same-category fill. */
@@ -69,5 +74,5 @@ export function relatedTools(tool: ToolDef, max = 6): ToolDef[] {
 }
 
 export function popularTools(ids: string[]): ToolDef[] {
-  return ids.map((id) => BY_ID.get(id)).filter((t): t is ToolDef => Boolean(t));
+  return ids.map((id) => BY_ID.get(id)).filter((t): t is ToolDef => Boolean(t?.indexable));
 }

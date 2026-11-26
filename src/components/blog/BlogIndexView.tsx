@@ -10,7 +10,7 @@ import { collectionGraph } from "@/lib/schema";
 export const BLOG_TITLE = "Blog: SEO, Images, PDFs and Web Tips | Premier SEO Services";
 export const BLOG_DESCRIPTION =
   "Practical articles from the Premier SEO Services team on SEO, content, images, PDFs and web development, with links to the free tools that help.";
-export const PER_PAGE = 12;
+export const PER_PAGE = 15;
 
 export function blogPagePath(n: number) {
   return n <= 1 ? "/blog/" : `/blog/page/${n}/`;

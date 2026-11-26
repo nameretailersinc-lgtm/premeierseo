@@ -10,7 +10,9 @@ import { type CancelToken, baseName, errorCode, errorMessage, isCancelled, openF
 import { IMAGE_LEVELS, READABLE_DPI, compressToTarget, hasSelectableText, keepTextCompress, rasterizePdf, type ImageLevel } from "../lib/pdf/raster";
 import { OutFileRow, Progress, Thumb, usePdfThumbnails, type OutFile } from "../lib/pdf/ui";
 
-type Mode = "keep" | "raster";
+type Mode = "keep" | "raster" | "target";
+/** Common upload limits offered as one-click targets (1 KB = 1,000 bytes). */
+const QUICK_TARGETS = [100, 200, 300, 500, 1000, 2000];
 type KeepLevel = "off" | "light" | "medium" | "strong";
 type RasterLevel = "high" | "balanced" | "small";
 
@@ -56,7 +58,7 @@ export default function PdfCompress({ toolId, config }: WidgetProps) {
     raster: "balanced" as RasterLevel,
     grey: false,
   });
-  const [targetText, setTargetText] = useState(String(presetKB ?? 100));
+  const [targetText, setTargetText] = useState(String(presetKB ?? 500));
   const [file, setFile] = useState<Loaded | null>(null);
   const [view, setView] = useState<PDFDocumentProxy | null>(null);
   const [loading, setLoading] = useState(false);
@@ -70,8 +72,10 @@ export default function PdfCompress({ toolId, config }: WidgetProps) {
   useEffect(() => () => void view?.destroy(), [view]);
   useEffect(() => () => void resultView?.destroy(), [resultView]);
 
-  const target = presetKB !== null ? Math.max(5, Math.round(Number(targetText) || 0)) : null;
-  const targetError = presetKB !== null && (!Number(targetText) || Number(targetText) < 5) ? "Enter a size of at least 5 KB." : null;
+  // Preset pages are always in target mode; the general compressor offers it as a third mode.
+  const targeting = presetKB !== null || opts.mode === "target";
+  const target = targeting ? Math.max(5, Math.round(Number(targetText) || 0)) : null;
+  const targetError = targeting && (!Number(targetText) || Number(targetText) < 5) ? "Enter a size of at least 5 KB." : null;
 
   const clearResult = () => {
     setResult(null);
@@ -265,6 +269,21 @@ export default function PdfCompress({ toolId, config }: WidgetProps) {
           }
         >
           <div className="grid gap-4 p-3 sm:p-4">
+            {presetKB === null && (
+              <Segmented<Mode>
+                legend="Compression mode"
+                value={opts.mode}
+                onChange={(m) => {
+                  setOpts((o) => ({ ...o, mode: m }));
+                  clearResult();
+                }}
+                options={[
+                  { value: "keep", label: "Keep text" },
+                  { value: "raster", label: "Smallest size" },
+                  { value: "target", label: "Target size" },
+                ]}
+              />
+            )}
             {target !== null ? (
               <>
                 <div className="flex flex-wrap items-end gap-4">
@@ -294,6 +313,22 @@ export default function PdfCompress({ toolId, config }: WidgetProps) {
                     />
                   </div>
                 </div>
+                <div role="group" aria-label="Common upload limits" className="flex flex-wrap gap-1.5">
+                  {QUICK_TARGETS.map((kb) => (
+                    <button
+                      key={kb}
+                      type="button"
+                      className="chip"
+                      aria-pressed={Number(targetText) === kb}
+                      onClick={() => {
+                        setTargetText(String(kb));
+                        clearResult();
+                      }}
+                    >
+                      {kb >= 1000 ? `${kb / 1000} MB` : `${kb} KB`}
+                    </button>
+                  ))}
+                </div>
                 {file.size <= (target ?? 0) * KB ? (
                   <Alert tone="success">This file is already under {target} KB. You don&apos;t need to compress it.</Alert>
                 ) : (
@@ -306,18 +341,6 @@ export default function PdfCompress({ toolId, config }: WidgetProps) {
               </>
             ) : (
               <>
-                <Segmented<Mode>
-                  legend="Compression mode"
-                  value={opts.mode}
-                  onChange={(m) => {
-                    setOpts((o) => ({ ...o, mode: m }));
-                    clearResult();
-                  }}
-                  options={[
-                    { value: "keep", label: "Keep text" },
-                    { value: "raster", label: "Smallest size" },
-                  ]}
-                />
                 {opts.mode === "keep" ? (
                   <div className="grid gap-2">
                     <Segmented<KeepLevel>

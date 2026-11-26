@@ -78,16 +78,49 @@ export interface Matrix {
   dark: (r: number, c: number) => boolean;
 }
 
+export interface QrLogo {
+  /** data: URL of a raster image. */
+  href: string;
+  /** width ÷ height of the image. */
+  aspect: number;
+  /** Longest logo edge as a percentage of the code's width, quiet zone excluded. */
+  percent: number;
+}
+
+/** The logo covers modules, so its size is capped well inside what level H error correction can recover. */
+export const LOGO_PERCENT = { min: 10, max: 22, initial: 18 } as const;
+
+/**
+ * Where the logo and its background plate go, in module units from the top-left of the image.
+ * The plate adds one blank module around the logo and stays clear of the three finder patterns.
+ */
+export function logoLayout(size: number, margin: number, logo: Pick<QrLogo, "aspect" | "percent">) {
+  const side = (size * Math.max(LOGO_PERCENT.min, Math.min(LOGO_PERCENT.max, logo.percent))) / 100;
+  const aspect = logo.aspect > 0 ? logo.aspect : 1;
+  const w = aspect >= 1 ? side : side * aspect;
+  const h = aspect >= 1 ? side / aspect : side;
+  const mid = margin + size / 2;
+  return {
+    image: { x: mid - w / 2, y: mid - h / 2, w, h },
+    plate: { x: mid - w / 2 - 1, y: mid - h / 2 - 1, w: w + 2, h: h + 2 },
+  };
+}
+
 /** SVG with one path; `margin` is the quiet zone in modules (the standard asks for 4). */
-export function matrixToSvg(m: Matrix, opts: { margin: number; fg: string; bg: string; px: number }): string {
+export function matrixToSvg(m: Matrix, opts: { margin: number; fg: string; bg: string; px: number; logo?: QrLogo | null }): string {
   const total = m.size + opts.margin * 2;
+  let overlay = "";
+  if (opts.logo) {
+    const { image: i, plate: p } = logoLayout(m.size, opts.margin, opts.logo);
+    overlay = `<rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" fill="${opts.bg}"/><image x="${i.x}" y="${i.y}" width="${i.w}" height="${i.h}" href="${opts.logo.href}" preserveAspectRatio="xMidYMid meet"/>`;
+  }
   let d = "";
   for (let r = 0; r < m.size; r++) {
     for (let c = 0; c < m.size; c++) {
       if (m.dark(r, c)) d += `M${c + opts.margin} ${r + opts.margin}h1v1h-1z`;
     }
   }
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${opts.px}" height="${opts.px}" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges"><rect width="${total}" height="${total}" fill="${opts.bg}"/><path d="${d}" fill="${opts.fg}"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${opts.px}" height="${opts.px}" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges"><rect width="${total}" height="${total}" fill="${opts.bg}"/><path d="${d}" fill="${opts.fg}"/>${overlay}</svg>`;
 }
 
 /** Whole-pixel module size closest to the requested width, so the PNG stays sharp. */

@@ -5,29 +5,35 @@ import { homeGraph } from "@/lib/schema";
 import { listPublishedPosts } from "@/lib/server/blog-store";
 import { buildMetadata } from "@/lib/seo";
 
-const TITLE = "Free SEO, Text, Image & PDF Tools – Premier SEO Services";
+const TITLE = "Free Online Tools – PDF, Image, SEO & Text Tools";
 const DESCRIPTION =
-  "Browser-based tools for everyday jobs: count words, compress images to an exact KB size, merge PDFs, check redirects and create meta tags. No sign-up.";
+  "Compress images, convert PDFs, check SEO, count words and perform everyday calculations with free online tools. No registration required. Most run in your browser.";
 
 export const metadata: Metadata = buildMetadata({ path: "/", title: TITLE, description: DESCRIPTION });
 
 // Re-rendered at most once a minute (and immediately when a post is saved in /admin/) to show the latest posts.
 export const revalidate = 60;
 
-/** Editorial picks (not usage data), matching the "Most-needed tools" row of the design. */
+/** Editorial picks (not usage data). Ordered around the highest-demand tasks in the keyword research. */
 const START = [
   "word-counter",
-  "reduce-image-size-in-kb",
-  "merge-pdf",
+  "age-calculator",
+  "qr-code-generator",
+  "image-compressor",
   "compress-pdf",
+  "merge-pdf",
   "image-resizer",
   "heic-to-jpg-converter",
-  "json-viewer",
-  "word-to-pdf",
 ];
 
 /** Four picks per toolkit: one row of cards on desktop. */
 const TOOLKITS: Toolkit[] = [
+  {
+    id: "imaging-tools",
+    heading: "Image and PDF toolkit",
+    blurb: "Shrink photos for upload forms, convert formats and build PDFs from images or Word documents.",
+    picks: ["reduce-image-size-in-kb", "png-to-jpg-converter", "jpg-to-pdf", "word-to-pdf"],
+  },
   {
     id: "text-tools",
     heading: "Text and content toolkit",
@@ -35,10 +41,10 @@ const TOOLKITS: Toolkit[] = [
     picks: ["character-counter", "uppercase-to-lowercase", "remove-duplicate-lines", "add-remove-line-breaks"],
   },
   {
-    id: "imaging-tools",
-    heading: "Image and PDF toolkit",
-    blurb: "Shrink photos for upload forms, convert formats, and split or build PDFs — all in your browser.",
-    picks: ["image-compressor", "png-to-jpg-converter", "split-pdf", "jpg-to-pdf"],
+    id: "calculator-tools",
+    heading: "Calculators and generators",
+    blurb: "Work out percentages and savings yield, or create barcodes and passwords. Calculator formulas are shown with the result.",
+    picks: ["percentage-calculator", "apy-calculator", "barcode-generator", "password-generator"],
   },
   {
     id: "free-seo-tools",
@@ -49,8 +55,8 @@ const TOOLKITS: Toolkit[] = [
   {
     id: "development-tools",
     heading: "Developer and webmaster toolkit",
-    blurb: "Test regular expressions, encode and decode data, convert timestamps and hash files.",
-    picks: ["regex-tester", "base64-encoder-decoder", "unix-timestamp-converter", "hash-generator"],
+    blurb: "Format JSON, encode and decode data, convert timestamps and hash files.",
+    picks: ["json-viewer", "base64-encoder-decoder", "unix-timestamp-converter", "hash-generator"],
   },
 ];
 

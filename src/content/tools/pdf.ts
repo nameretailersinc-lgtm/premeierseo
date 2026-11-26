@@ -80,6 +80,7 @@ export const PDF_TOOLS: ToolDef[] = [
     sources: [{ label: "pdf-lib documentation", url: "https://pdf-lib.js.org/" }],
     related: ["split-pdf", "compress-pdf", "rotate-pdf", "jpg-to-pdf", "pdf-to-zip"],
     links: [
+      { href: "/blog/how-to-merge-pdf-files-on-phone/", anchor: "merge PDFs on a phone" },
       { href: "/split-pdf/", anchor: "split PDF" },
       { href: "/compress-pdf/", anchor: "compress PDF" },
       { href: "/rotate-pdf/", anchor: "rotate PDF" },
@@ -275,7 +276,7 @@ export const PDF_TOOLS: ToolDef[] = [
     archetype: "file",
     widget: "pdf-compress",
     config: { mode: "choose" },
-    aliases: ["reduce pdf size", "pdf compressor", "shrink pdf", "make pdf smaller", "pdf size reducer", "compress pdf file", "reduce pdf file size", "optimize pdf", "compres pdf", "pdf reducer"],
+    aliases: ["compress pdf to 2mb", "compress pdf to 500kb", "compress pdf to 300kb", "reduce pdf size", "pdf compressor", "shrink pdf", "make pdf smaller", "pdf size reducer", "compress pdf file", "reduce pdf file size", "optimize pdf", "compres pdf", "pdf reducer"],
     keywords: ["smaller", "email", "upload limit", "scanned", "file size"],
     processing: "browser",
     limits: [
@@ -284,8 +285,8 @@ export const PDF_TOOLS: ToolDef[] = [
     ],
     steps: [
       "Press **Choose PDF**. The size, page count and whether the PDF has selectable text are shown.",
-      "Under **Compression mode**, choose **Keep text** or **Smallest size**.",
-      "For Keep text, pick an **Image compression** level (None, Light, Medium or Strong). For Smallest size, pick a **Page image quality** and optionally **Greyscale**.",
+      "Under **Compression mode**, choose **Keep text**, **Smallest size** or **Target size**.",
+      "For Keep text, pick an **Image compression** level (None, Light, Medium or Strong). For Smallest size, pick a **Page image quality** and optionally **Greyscale**. For Target size, tap a common limit (100KB to 2MB) or type your own.",
       "Press **Compress PDF**, compare the before and after sizes and the page preview, then press **Download**.",
     ],
     example: {
@@ -295,6 +296,10 @@ export const PDF_TOOLS: ToolDef[] = [
       note: "On a 6-page text-only PDF saved without object streams, Keep text with no image compression went from 21.0 KB to 13.6 KB.",
     },
     sections: [
+      {
+        heading: "Compressing to an upload limit",
+        body: "**Target size** works toward a limit such as 300KB, 500KB or 2MB. It first tries to keep selectable text while reducing the photos inside the file. If that isn't enough, it renders pages as images at the highest resolution that fits, and says that text is no longer selectable. When even the lowest setting is too large, it reports the smallest size reached instead of claiming success.\n\n1 KB here is 1,000 bytes and 1 MB is 1,000,000 bytes, so a result also fits limits counted in units of 1,024. Dedicated pages start at [100KB](/compress-pdf-to-100kb/), [200KB](/compress-pdf-to-200kb/) and [1MB](/compress-pdf-to-1mb/).",
+      },
       {
         heading: "How PDF compression works",
         body: "A PDF is a container of objects: page descriptions, fonts, images and metadata. Most large PDFs are large because of their images, so that is where real savings come from. This tool offers two honest approaches:\n\n- **Keep text** rewrites the file: it drops objects nothing refers to, compresses data that was stored uncompressed, packs small objects into compressed object streams and, if you choose an image level, re-saves photos as smaller JPEGs. Text, fonts, links and form fields are untouched.\n- **Smallest size** renders every page to a picture with PDF.js and builds a new PDF from those JPEGs. It reaches much smaller sizes on scans, but the text becomes part of an image.\n\nThe result always shows the real before and after size; if a method doesn't make the file smaller, it says so and offers no download.",
@@ -351,7 +356,7 @@ export const PDF_TOOLS: ToolDef[] = [
       "Runs in the browser; files are not uploaded",
     ],
     indexable: true,
-    updated: UPDATED,
+    updated: "2026-11-26",
     priority: 1,
   },
   {
@@ -853,6 +858,7 @@ export const PDF_TOOLS: ToolDef[] = [
     ],
     related: ["pdf-to-jpg", "merge-pdf", "compress-pdf-to-100kb", "heic-to-jpg-converter", "compress-pdf"],
     links: [
+      { href: "/blog/how-to-convert-images-to-pdf/", anchor: "convert images into a PDF" },
       { href: "/pdf-to-jpg/", anchor: "PDF to JPG" },
       { href: "/compress-pdf-to-100kb/", anchor: "compress PDF to 100KB" },
       { href: "/heic-to-jpg-converter/", anchor: "HEIC to JPG" },

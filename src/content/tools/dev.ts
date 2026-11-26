@@ -674,6 +674,7 @@ export const DEV_TOOLS: ToolDef[] = [
     sources: [RFC8259, { label: "ECMA-404: The JSON Data Interchange Syntax", url: "https://ecma-international.org/publications-and-standards/standards/ecma-404/" }],
     related: ["json-to-csv", "csv-to-json", "javascript-formatter", "regex-tester", "base64-encoder-decoder"],
     links: [
+      { href: "/blog/how-to-fix-invalid-json/", anchor: "fixing invalid JSON" },
       { href: "/json-to-csv/", anchor: "JSON to CSV" },
       { href: "/csv-to-json/", anchor: "CSV to JSON" },
       { href: "/javascript-formatter/", anchor: "JavaScript formatter" },

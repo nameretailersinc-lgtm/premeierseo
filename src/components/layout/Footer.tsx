@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/content/categories";
-import { TOOLS } from "@/content/tools";
+import { PUBLIC_TOOLS as TOOLS } from "@/content/tools";
 import { SITE } from "@/lib/site";
 import { Icon } from "@/components/Icon";
 import { Wordmark } from "./Wordmark";

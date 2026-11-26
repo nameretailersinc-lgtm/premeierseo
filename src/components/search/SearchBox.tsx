@@ -95,7 +95,7 @@ export function SearchBox({
     const t = setTimeout(() => {
       const n = selectable.length;
       setLiveMsg(n ? `${n} result${n === 1 ? "" : "s"}` : "No results");
-      if (index && !n) track("search_no_results", { query_normalized: q.length <= 50 ? q.toLowerCase().replace(/\S+@\S+|https?:\S+|\d{5,}/g, "") : "[redacted]" });
+      if (index && !n) track("search_no_results", { query_length: bucket(q.length, [5, 15, 30], ["1-4", "5-14", "15-29", "30+"]) });
       if (index) track("search_used", { query_length: bucket(q.length, [5, 15, 30], ["1-4", "5-14", "15-29", "30+"]), results_count: n });
     }, 500);
     return () => clearTimeout(t);

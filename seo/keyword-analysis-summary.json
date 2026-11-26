@@ -1,0 +1,120 @@
+{
+  "record_count": 46678,
+  "numeric_volume_records": 46342,
+  "unique_normalized_numeric_keywords": 34119,
+  "sources": [
+    {
+      "dataset": "image-1",
+      "file": "Keyword Stats 2026-11-26 at 17_25_23.csv",
+      "sha256": "475479aeadddb635e088f0c00490cc0da32591e577cd0a3b979e2768e4da95a2",
+      "content_sha256_without_export_title": "895bf846825ae4a64d442cdeb18e02615a007eeeea1743ba9b7611f5cc3ccc30",
+      "period": "November 1, 2025 - October 31, 2026",
+      "rows": 12514,
+      "numeric_volume_rows": 12220,
+      "geographic_targeting": "Not supplied in export; PKR identifies bid currency only"
+    },
+    {
+      "dataset": "image-2",
+      "file": "Keyword Stats 2026-11-26 at 17_26_36.csv",
+      "sha256": "69d2acd61318642e6b504d9a7ccbddb44b5212993112ef2f3b35160c72e2e137",
+      "content_sha256_without_export_title": "d36a8eb0b5c7c98ea7fabeefef61da6f0383884851dc0ddb816b7af901cc23a0",
+      "period": "November 1, 2025 - October 31, 2026",
+      "rows": 12486,
+      "numeric_volume_rows": 12466,
+      "geographic_targeting": "Not supplied in export; PKR identifies bid currency only"
+    },
+    {
+      "dataset": "pdf",
+      "file": "Keyword Stats 2026-11-26 at 17_27_52.csv",
+      "sha256": "9cb52498c18801ddbbbc3cf742d2c093acd253188e844a76777a6c4143c47f12",
+      "content_sha256_without_export_title": "27c65915acaea3eb6945170acf399bd72b836086337cb08ec989520fbd033343",
+      "period": "November 1, 2025 - October 31, 2026",
+      "rows": 11154,
+      "numeric_volume_rows": 11132,
+      "geographic_targeting": "Not supplied in export; PKR identifies bid currency only"
+    },
+    {
+      "dataset": "seo",
+      "file": "Keyword Stats 2026-11-26 at 17_29_00.csv",
+      "sha256": "f9237f29a446db57a485adeef45d50933edbfc78eac6200677db838476f4d5d2",
+      "content_sha256_without_export_title": "2a3a947f3002ccee2607167c8198e25e374e235f5c932a4794ea19f20d377f93",
+      "period": "November 1, 2025 - October 31, 2026",
+      "rows": 5959,
+      "numeric_volume_rows": 5959,
+      "geographic_targeting": "Not supplied in export; PKR identifies bid currency only"
+    },
+    {
+      "dataset": "general-tools",
+      "file": "Keyword Stats 2026-11-26 at 17_29_29.csv",
+      "sha256": "15daeeae861c3a1e13a4ff6649ef1244512ffbe8f6a652c832016e63de44ff8a",
+      "content_sha256_without_export_title": "206940dd02865624f00c7359497a77b3ce9de0eba93d4693677de4f5e63ccce6",
+      "period": "November 1, 2025 - October 31, 2026",
+      "rows": 4565,
+      "numeric_volume_rows": 4565,
+      "geographic_targeting": "Not supplied in export; PKR identifies bid currency only"
+    }
+  ],
+  "dispositions": {
+    "target existing page": 134,
+    "duplicate variant": 28805,
+    "manual review": 14267,
+    "branded navigational query": 2577,
+    "irrelevant": 95,
+    "target new page": 798,
+    "supporting content": 2
+  },
+  "mapping_confidence": {
+    "high": 10460,
+    "medium": 22154,
+    "low": 14064
+  },
+  "registry_tools": 178,
+  "indexable_registry_tools": 175,
+  "attachment_reconciliation": [
+    {
+      "file": "C:\\Users\\zuhoor\\.codex\\attachments\\856de896-7dff-41dd-9e72-833b3e458977\\Pasted text.txt",
+      "sha256": "07c0c90952be2156012b94d522eb39a9fa6daa8fc90dc464bbbb3d8ae6db50c9",
+      "complete_metric_row_match": [
+        "image-1"
+      ],
+      "rows_detected": 12514,
+      "double_counted": false
+    },
+    {
+      "file": "C:\\Users\\zuhoor\\.codex\\attachments\\aeb94b49-10a9-4453-93dd-dce59559505e\\Pasted text.txt",
+      "sha256": "f3e93590cf1a7e66f4854e315d59ba384027fe19d895f77daf1458ff8e97420c",
+      "complete_metric_row_match": [
+        "image-2"
+      ],
+      "rows_detected": 12486,
+      "double_counted": false
+    },
+    {
+      "file": "C:\\Users\\zuhoor\\.codex\\attachments\\aa5de6ce-c935-46d8-a58f-c07fe3202670\\Pasted text.txt",
+      "sha256": "368fa5e983304ce352f667a80079876b410964fd8c7ae549e6abeb1f7f02489b",
+      "complete_metric_row_match": [
+        "pdf"
+      ],
+      "rows_detected": 11154,
+      "double_counted": false
+    },
+    {
+      "file": "C:\\Users\\zuhoor\\.codex\\attachments\\e76755ce-5851-465f-b360-8cebb6705188\\Pasted text.txt",
+      "sha256": "c0e03dbac761b07b0b29840c737b9673f2956d7e4fe72eae5c3ca149c5932078",
+      "complete_metric_row_match": [
+        "seo"
+      ],
+      "rows_detected": 5959,
+      "double_counted": false
+    },
+    {
+      "file": "C:\\Users\\zuhoor\\.codex\\attachments\\3801507f-cc09-414d-aa49-5d3be90656fb\\Pasted text.txt",
+      "sha256": "8519386f7245302b4e07ce788c79d650a961536a8e0437d3e3c7a3c9a6d7ea23",
+      "complete_metric_row_match": [
+        "general-tools"
+      ],
+      "rows_detected": 4565,
+      "double_counted": false
+    }
+  ]
+}

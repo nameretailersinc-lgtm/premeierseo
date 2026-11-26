@@ -6,6 +6,7 @@ import { buildMetadata } from "@/lib/seo";
 
 /* Tools whose indexed URL is nested under /text-tools/ (kept as-is: /text-tools/add-remove-line-breaks/). */
 export const dynamicParams = false;
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return TOOLS.filter((t) => t.path.startsWith("/text-tools/") && t.path.split("/").filter(Boolean).length === 2).map((t) => ({

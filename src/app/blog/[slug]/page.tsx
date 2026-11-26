@@ -32,10 +32,8 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
     : { url: absUrl(`${path}og-image.png`), width: 1200, height: 630, alt: p.title };
   const ogTitle = p.seo.ogTitle || title;
   const ogDescription = p.seo.ogDescription || description;
-  const keywords = [p.seo.focusKeyword, ...p.seo.secondaryKeywords].filter(Boolean);
   return {
     ...base,
-    ...(keywords.length ? { keywords } : {}),
     ...(p.authorName ? { authors: [{ name: p.authorName, url: p.authorUrl || undefined }] } : {}),
     category: p.category,
     alternates: { canonical: p.seo.canonicalUrl || absUrl(path) },

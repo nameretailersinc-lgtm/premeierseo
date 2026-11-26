@@ -8,7 +8,7 @@ import { ToolList } from "@/components/cards";
 import { HubFilter } from "@/components/HubFilter";
 import { JsonLd } from "@/components/JsonLd";
 import { CATEGORIES } from "@/content/categories";
-import { TOOLS } from "@/content/tools";
+import { PUBLIC_TOOLS as TOOLS } from "@/content/tools";
 import { categoryArt } from "@/lib/illustrations";
 import { collectionGraph } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";

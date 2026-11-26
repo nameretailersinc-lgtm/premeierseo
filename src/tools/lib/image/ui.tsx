@@ -28,6 +28,8 @@ export interface OutImage {
   info?: string;
   /** The original file is offered unchanged (already under target, or smaller than any re-encode). */
   original?: boolean;
+  /** False when a target size/range could not be met; preview/download can still be useful. */
+  reached?: boolean;
 }
 
 export interface Row {
@@ -294,7 +296,7 @@ export function RowList({
                   aria-label={`Download ${out.name}`}
                   onClick={() => {
                     downloadBlob(out.blob, out.name);
-                    completed("download");
+                    completed("download", { reached: out.reached !== false });
                   }}
                 >
                   <span className="hidden sm:inline">Download</span>

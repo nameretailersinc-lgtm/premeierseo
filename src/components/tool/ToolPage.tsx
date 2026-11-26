@@ -8,12 +8,24 @@ import { JsonLd } from "@/components/JsonLd";
 import { InlineMd, Markdown } from "@/components/Markdown";
 import { CATEGORY_BY_ID } from "@/content/categories";
 import { relatedTools } from "@/content/tools";
+import { postPath } from "@/lib/blog-types";
 import { toolGraph, type Crumb } from "@/lib/schema";
+import { listPublishedPosts } from "@/lib/server/blog-store";
 import type { Archetype, ToolDef } from "@/lib/types";
 import { ToolWidget } from "@/tools/registry";
 import { privacyStatement } from "./privacy";
+import { RelatedTracker } from "./RelatedTracker";
 import { toolHue } from "@/lib/tool-icon";
 import { howToHeading, questionsHeading } from "@/lib/tool-headings";
+
+async function publishedGuidePaths(): Promise<Set<string>> {
+  try {
+    return new Set((await listPublishedPosts()).filter((p) => !p.seo.noindex).map((p) => postPath(p.slug)));
+  } catch {
+    // Blog storage is optional for a tool page: render without guide links rather than fail the tool.
+    return new Set();
+  }
+}
 
 function formatDate(iso: string) {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
@@ -44,12 +56,16 @@ function jumpLinks(tool: ToolDef): { id: string; label: string }[] {
  * how to use → example → explanation → privacy → FAQ, with related tools in a rail.
  * Everything except the widget is server-rendered HTML.
  */
-export function ToolPage({ tool }: { tool: ToolDef }) {
+export async function ToolPage({ tool }: { tool: ToolDef }) {
+  const guides = await publishedGuidePaths();
   const cat = CATEGORY_BY_ID[tool.category];
   const crumbs: Crumb[] = [{ name: "Home", path: "/" }, { name: cat.label, path: cat.path }, { name: tool.name }];
   const related = relatedTools(tool, 6);
   const privacy = privacyStatement(tool);
-  const contextual = (tool.links ?? []).filter((l) => !related.some((r) => r.path === l.href) && !l.href.startsWith("/blog/"));
+  // Guide links appear only while that post is published, so a deleted or draft post never becomes a 404 link.
+  const contextual = (tool.links ?? []).filter(
+    (l) => !related.some((r) => r.path === l.href) && (!l.href.startsWith("/blog/") || guides.has(l.href)),
+  );
   const jumps = jumpLinks(tool);
 
   return (
@@ -270,23 +286,25 @@ export function ToolPage({ tool }: { tool: ToolDef }) {
                 <Icon name="layout-grid" size={16} className="text-ink-3" />
                 Related tools
               </h2>
-              <ul className="grid gap-1">
-                {related.map((r) => (
-                  <li
-                    key={r.id}
-                    className={`group hue-${toolHue(r.id)} relative flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-hue-tint has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-focus`}
-                  >
-                    <ToolMark tool={r} size={40} className="rounded-xl" />
-                    <span className="min-w-0 flex-1">
-                      <Link href={r.path} className="text-sm font-semibold text-ink after:absolute after:inset-0 focus-visible:outline-none">
-                        {r.name}
-                      </Link>
-                      <span className="mt-0.5 line-clamp-1 block text-xs text-ink-3">{r.card}</span>
-                    </span>
-                    <Icon name="chevron-right" size={16} className="shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" />
-                  </li>
-                ))}
-              </ul>
+              <RelatedTracker toolId={tool.id}>
+                <ul className="grid gap-1">
+                  {related.map((r, i) => (
+                    <li
+                      key={r.id}
+                      className={`group hue-${toolHue(r.id)} relative flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-hue-tint has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-focus`}
+                    >
+                      <ToolMark tool={r} size={40} className="rounded-xl" />
+                      <span className="min-w-0 flex-1">
+                        <Link href={r.path} data-related={r.id} data-position={i + 1} className="text-sm font-semibold text-ink after:absolute after:inset-0 focus-visible:outline-none">
+                          {r.name}
+                        </Link>
+                        <span className="mt-0.5 line-clamp-1 block text-xs text-ink-3">{r.card}</span>
+                      </span>
+                      <Icon name="chevron-right" size={16} className="shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" />
+                    </li>
+                  ))}
+                </ul>
+              </RelatedTracker>
               <div className="mt-2.5 border-t border-line px-1 pt-3">
                 <Link href={cat.path} className="link-more">
                   Browse all {cat.label.toLowerCase()} <Icon name="arrow-right" size={16} />

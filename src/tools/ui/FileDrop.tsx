@@ -18,6 +18,7 @@ export function FileDrop({
   maxBytes = 100 * 1024 * 1024,
   label,
   pasteImages = false,
+  disabled = false,
 }: {
   accept: string;
   multiple?: boolean;
@@ -27,6 +28,7 @@ export function FileDrop({
   maxBytes?: number;
   label?: string;
   pasteImages?: boolean;
+  disabled?: boolean;
 }) {
   const id = useId();
   const { used, announce, error } = useTool();
@@ -43,7 +45,7 @@ export function FileDrop({
   };
 
   const take = (list: FileList | File[] | null, method: string) => {
-    if (!list || !list.length) return;
+    if (disabled || !list || !list.length) return;
     const files = Array.from(list);
     const ok = files.filter((f) => accepts(f) && f.size <= maxBytes);
     const bad = files.filter((f) => !ok.includes(f));
@@ -82,6 +84,7 @@ export function FileDrop({
         type="file"
         accept={accept}
         multiple={multiple}
+        disabled={disabled}
         className="peer sr-only"
         onChange={(e) => take(e.target.files, "file_picker")}
       />
@@ -89,9 +92,10 @@ export function FileDrop({
         htmlFor={id}
         data-drag={drag || undefined}
         data-compact={compact || undefined}
+        aria-disabled={disabled || undefined}
         onDragOver={(e) => {
           e.preventDefault();
-          setDrag(true);
+          if (!disabled) setDrag(true);
         }}
         onDragLeave={() => setDrag(false)}
         onDrop={(e) => {

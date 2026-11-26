@@ -9,7 +9,7 @@ import { HomeHero } from "./HomeHero";
 import { CATEGORIES, CATEGORY_BY_ID } from "@/content/categories";
 import { PostCard } from "@/components/blog/PostCard";
 import type { BlogPost } from "@/lib/blog-types";
-import { TOOLS, popularTools } from "@/content/tools";
+import { PUBLIC_TOOLS as TOOLS, popularTools } from "@/content/tools";
 import type { CategoryId, Faq, IconName } from "@/lib/types";
 
 export interface Toolkit {

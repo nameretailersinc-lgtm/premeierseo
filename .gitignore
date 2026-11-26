@@ -48,6 +48,35 @@ next-env.d.ts
 *.md
 !README.md
 !**/README.md
+!/seo/*.md
+!/src/content/blog/*.md
+
+# temporary build directories and local tool state
+/.next-*/
+/.taste-skill/
+
+# logs and local clutter
+*.log
+__pycache__/
+*.pyc
+Thumbs.db
+
+# pasted keyword exports (private Google Ads data; keep them outside the repository)
+/Pasted text*.txt
+
+# patch files
+*.patch
+
+# large generated keyword data: rebuild with scripts/seo-export-registry.ts and scripts/analyze-keywords.py
+# (scripts/build-blog-seed.mjs reads keyword-page-mapping.csv; the site build does not need it)
+/seo/keyword-master.csv
+/seo/keyword-page-mapping.csv
+/seo/tool-registry.json
+
+# raw results rewritten on every test run (the .md summaries are kept)
+/seo/browser-test-results.json
+/seo/crawl-audit.json
+/seo/functionality-results.json
 
 # QA reports
 /docs/qa/

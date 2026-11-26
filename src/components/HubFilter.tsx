@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import { Icon } from "./Icon";
-import { track } from "@/lib/analytics";
+import { bucket, track } from "@/lib/analytics";
 
 /**
  * Progressive filter for server-rendered tool grids. Without JS every tool stays visible and the
@@ -54,7 +54,10 @@ export function HubFilter({
     // eslint-disable-next-line react-hooks/set-state-in-effect -- sync visible count
     setCount(shown);
     if (q) {
-      const t = setTimeout(() => track("filter_used", { results_count: shown }), 800);
+      const t = setTimeout(() => {
+        track("filter_used", { results_count: shown });
+        track("category_search", { results_count: shown, query_length: bucket(q.length, [5, 15, 30], ["1-4", "5-14", "15-29", "30+"]) });
+      }, 800);
       return () => clearTimeout(t);
     }
   }, [q, group, items]);
