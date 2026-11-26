@@ -45,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={sans.variable} suppressHydrationWarning>
       <head>
+        <link rel="describedby" href="/llms.txt" type="text/plain" />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="flex min-h-dvh flex-col bg-canvas text-ink antialiased">

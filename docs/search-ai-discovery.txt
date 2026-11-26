@@ -1,0 +1,46 @@
+Search and AI discovery changes (2026-11-26)
+
+Observed on production: /blog/ returned 200 with noindex and an empty listing;
+/blog/google-indexing-troubleshooting/ returned 404; sitemap.xml had no blog URLs.
+The admin blog replacement removed 18 previously published guides without import.
+
+Recovery: src/content/legacy-blog.json preserves the original published content,
+slugs, source references and dates from Git revision 36840a5^.
+Without MongoDB these guides are available from the bundled snapshot. When MongoDB
+is configured, the first blog read imports missing slugs using $setOnInsert and
+records restore-published-guides-v1 in blog_migrations. Existing posts, including
+drafts with matching slugs, are preserved. Subsequent deletions stay deleted.
+The runtime database user needs access to blog_posts and blog_migrations.
+
+SEO: original article URLs return content again, the populated blog becomes
+indexable, and published indexable canonical articles enter the sitemap. Explicit
+self-canonical articles are included; copies canonicalized elsewhere are excluded.
+
+AEO/GEO: shared page schema identifies the publisher. Tool and category schemas
+include questions and answers already visible in HTML. Tool schema includes
+visible source citations and summaries. Blog schema connects pages to articles
+and preserves publication/modification dates and summaries.
+
+/llms.txt lists every indexable tool, category, published canonical article and
+site information page. /llms-full.txt contains tool instructions, examples,
+limitations, answers, references and full published articles. Both are generated
+from the same content sources as the site. Neither includes draft/noindex posts
+or articles canonicalized elsewhere. The shared layout links to /llms.txt.
+Existing robots.txt allows public search and AI crawling and protects admin/API
+routes. llms.txt is a proposed discovery format, not an indexing guarantee or an
+access-control mechanism. Full text includes relative links against the site origin.
+
+Validation: npm run test:seo exercises recovery, sitemap inclusion, AI discovery,
+schema relationships, migration preservation of existing drafts and deletion.
+CI smoke checks include both text routes and a restored article.
+
+After deploying: verify /blog/ and restored article responses, then submit
+https://premierseoservices.com/sitemap.xml in Google Search Console. Inspect an
+important article, run Test live URL, then Request indexing. Review Google's
+selected canonical and indexing reason in URL Inspection. This workspace has no
+connected Search Console account, so no indexing request has been submitted.
+
+References:
+https://llmstxt.org/
+https://developers.google.com/search/docs/appearance/ai-features
+https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl

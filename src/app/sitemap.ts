@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 /** Only indexable, 200, self-canonical URLs. lastModified = the content's real edit date, never build time. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const newest = (dates: string[]) => dates.sort().at(-1)!;
-  const posts = (await listPublishedPosts()).filter((p) => !p.seo.noindex && !p.seo.canonicalUrl);
+  const posts = (await listPublishedPosts()).filter((p) => !p.seo.noindex && (!p.seo.canonicalUrl || p.seo.canonicalUrl === absUrl(postPath(p.slug))));
   const entries: MetadataRoute.Sitemap = [
     { url: absUrl("/"), lastModified: newest([...TOOLS.map((t) => t.updated), ...posts.map((p) => p.dateModified)]) },
     { url: absUrl("/tools/"), lastModified: newest(TOOLS.map((t) => t.updated)) },

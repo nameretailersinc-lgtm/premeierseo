@@ -120,7 +120,10 @@ jobs:
             / \
             /robots.txt \
             /sitemap.xml \
+            /llms.txt \
+            /llms-full.txt \
             /blog/ \
+            /blog/google-indexing-troubleshooting/ \
             /admin/login/ \
             /google36515a0fbd6dce32.html
           do

@@ -1,6 +1,6 @@
 import { SITE, absUrl } from "./site";
 import type { CategoryDef, ToolDef } from "./types";
-import { effectiveDescription, effectiveMetaTitle, postPath, wordCount, type BlogPost } from "./blog-types";
+import { effectiveDescription, effectiveMetaTitle, plainText, postPath, wordCount, type BlogPost } from "./blog-types";
 
 /** JSON-LD graph builders. Only describe what is visible and true on the page. */
 
@@ -74,6 +74,7 @@ function webPageNode(path: string, name: string, description: string, extra: Nod
     description,
     isPartOf: { "@id": WEBSITE_ID },
     inLanguage: SITE.language,
+    publisher: { "@id": ORG_ID },
     ...extra,
   };
 }
@@ -94,6 +95,12 @@ export function toolGraph(tool: ToolDef, crumbs: Crumb[]): Node[] {
       mainEntity: { "@id": `${url}#app` },
       primaryImageOfPage: { "@id": `${url}#primaryimage` },
       dateModified: tool.updated,
+      abstract: tool.summary,
+      ...(tool.sources?.length ? { citation: tool.sources.map((s) => ({ "@type": "CreativeWork", name: s.label, url: s.url })) } : {}),
+      ...(tool.faq.length ? { hasPart: tool.faq.map((f, i) => ({
+        "@type": "Question", "@id": `${url}#question-${i + 1}`, name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: plainText(f.a) },
+      })) } : {}),
     }),
     {
       "@type": "WebApplication",
@@ -107,6 +114,7 @@ export function toolGraph(tool: ToolDef, crumbs: Crumb[]): Node[] {
       isAccessibleForFree: true,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       featureList: tool.features,
+      inLanguage: SITE.language,
       provider: { "@id": ORG_ID },
     },
     breadcrumbNode(tool.path, crumbs),
@@ -129,7 +137,13 @@ export function categoryGraph(cat: CategoryDef, tools: ToolDef[], crumbs: Crumb[
       cat.path,
       cat.title,
       cat.metaDescription,
-      { breadcrumb: { "@id": `${url}#breadcrumb` }, mainEntity: { "@id": `${url}#list` }, dateModified: cat.updated },
+      {
+        breadcrumb: { "@id": `${url}#breadcrumb` }, mainEntity: { "@id": `${url}#list` }, dateModified: cat.updated,
+        ...(cat.faq.length ? { hasPart: cat.faq.map((f, i) => ({
+          "@type": "Question", "@id": `${url}#question-${i + 1}`, name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: plainText(f.a) },
+        })) } : {}),
+      },
       "CollectionPage",
     ),
     {
@@ -187,6 +201,7 @@ export function blogPostGraph(p: BlogPost, crumbs: Crumb[]): Node[] {
         : `${url}og-image.png`,
       datePublished: p.datePublished,
       dateModified: p.dateModified,
+      abstract: p.excerpt || description,
       author,
       publisher: { "@id": ORG_ID },
       isPartOf: { "@id": WEBSITE_ID },
@@ -197,6 +212,9 @@ export function blogPostGraph(p: BlogPost, crumbs: Crumb[]): Node[] {
     },
     webPageNode(path, title, description, {
       breadcrumb: { "@id": `${url}#breadcrumb` },
+      mainEntity: { "@id": `${url}#article` },
+      datePublished: p.datePublished,
+      dateModified: p.dateModified,
       ...(img ? { primaryImageOfPage: { "@type": "ImageObject", url: absImage(img.src) } } : {}),
     }),
     breadcrumbNode(path, crumbs),

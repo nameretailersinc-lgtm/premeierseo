@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { GridFSBucket, type Collection } from "mongodb";
 import { getTool } from "@/content/tools";
+import legacyPosts from "@/content/legacy-blog.json";
 import { getDb, mongoConfigured } from "./mongo";
 import {
   LIMITS,
@@ -19,8 +20,8 @@ import {
  * MongoDB blog store.
  *   posts:        collection "blog_posts" (_id = post id, unique index on slug)
  *   images:       GridFS bucket "blog_images" (filename = "uploads/YYYY/MM/name.ext", served by /media/…)
- * When MONGODB_URI is not set, public reads return nothing (so builds and CI smoke tests work without a
- * database) and admin writes fail with a clear message.
+ * The original published guides remain available without MongoDB. With MongoDB configured,
+ * a one-time migration imports them without replacing existing posts or resurrecting later deletions.
  */
 
 type PostDoc = Omit<BlogPost, "id"> & { _id: string };
@@ -29,6 +30,8 @@ const toPost = ({ _id, ...rest }: PostDoc): BlogPost => normalize({ ...rest, id:
 const toDoc = ({ id, ...rest }: BlogPost): PostDoc => ({ _id: id, ...rest });
 
 let indexes: Promise<unknown> | null = null;
+let migration: Promise<void> | null = null;
+const originals = legacyPosts as BlogPost[];
 
 async function posts(): Promise<Collection<PostDoc>> {
   const db = await getDb();
@@ -42,6 +45,16 @@ async function posts(): Promise<Collection<PostDoc>> {
     throw e;
   });
   await indexes;
+  migration ??= (async () => {
+    const migrations = db.collection<{ _id: string; completedAt: Date }>("blog_migrations");
+    const id = "restore-published-guides-v1";
+    if (await migrations.findOne({ _id: id })) return;
+    await col.bulkWrite(originals.map((post) => ({
+      updateOne: { filter: { slug: post.slug }, update: { $setOnInsert: toDoc(post) }, upsert: true },
+    })));
+    await migrations.updateOne({ _id: id }, { $set: { completedAt: new Date() } }, { upsert: true });
+  })().catch((e) => { migration = null; throw e; });
+  await migration;
   return col;
 }
 
@@ -54,13 +67,13 @@ function requireDb() {
 /* ---------- reads ---------- */
 
 export async function listAllPosts(): Promise<BlogPost[]> {
-  if (!mongoConfigured()) return [];
+  if (!mongoConfigured()) return structuredClone(originals);
   return (await (await posts()).find({}).sort({ dateModified: -1 }).toArray()).map(toPost);
 }
 
 /** Published posts whose publish date has arrived (a future date acts as scheduling). */
 export async function listPublishedPosts(): Promise<BlogPost[]> {
-  if (!mongoConfigured()) return [];
+  if (!mongoConfigured()) return structuredClone(originals).sort((a, b) => b.datePublished.localeCompare(a.datePublished));
   const now = new Date().toISOString();
   const docs = await (await posts())
     .find({ status: "published", datePublished: { $lte: now, $ne: "" } })
@@ -70,13 +83,14 @@ export async function listPublishedPosts(): Promise<BlogPost[]> {
 }
 
 export async function getPostById(id: string): Promise<BlogPost | undefined> {
-  if (!mongoConfigured()) return undefined;
+  if (!mongoConfigured()) return structuredClone(originals.find((p) => p.id === id));
   const doc = await (await posts()).findOne({ _id: String(id) });
   return doc ? toPost(doc) : undefined;
 }
 
 export async function getPublishedPost(slug: string): Promise<BlogPost | undefined> {
-  if (!mongoConfigured() || !/^[a-z0-9-]{1,100}$/.test(slug)) return undefined;
+  if (!/^[a-z0-9-]{1,100}$/.test(slug)) return undefined;
+  if (!mongoConfigured()) return structuredClone(originals.find((p) => p.slug === slug));
   const doc = await (await posts()).findOne({ slug, status: "published" });
   if (!doc) return undefined;
   const p = toPost(doc);

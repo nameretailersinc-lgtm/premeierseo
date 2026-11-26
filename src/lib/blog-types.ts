@@ -1,6 +1,6 @@
 /**
  * Blog post model shared by the admin editor (client) and the public blog pages (server).
- * Posts are written from /admin/ and stored on disk by src/lib/server/blog-store.ts.
+ * Posts are written from /admin/ and stored in MongoDB by src/lib/server/blog-store.ts.
  */
 
 export type PostStatus = "draft" | "published";

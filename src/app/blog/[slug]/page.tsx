@@ -15,7 +15,7 @@ import { getPublishedPost, listPublishedPosts } from "@/lib/server/blog-store";
 import { SITE, absUrl } from "@/lib/site";
 import { toolHue } from "@/lib/tool-icon";
 
-// Posts are managed from /admin/ and read from the data volume at request time.
+// Posts are managed from /admin/ and read from MongoDB at request time.
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): Promise<Metadata> {
